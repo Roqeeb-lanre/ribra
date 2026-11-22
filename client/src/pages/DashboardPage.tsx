@@ -1,16 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Button } from '@/components/ui/Button';
-import { Logo } from '@/components/ui/Logo';
-import { logout } from '@/features/auth/api';
+import { Link } from 'react-router';
+import { useAnalyses, useUsage } from '@/features/cv/api';
+import { formatDate, scoreTone } from '@/features/cv/score';
+import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/stores/auth';
 
 const comingSoon = [
-  {
-    stage: 'Stage 3',
-    title: 'CV analyzer',
-    text: 'Upload your CV and get an ATS-style score with fixes.',
-  },
   { stage: 'Stage 4', title: 'Job match', text: 'Compare your CV with any job description.' },
   { stage: 'Stage 5', title: 'Application tracker', text: 'Track every application on one board.' },
   {
@@ -22,82 +16,93 @@ const comingSoon = [
 
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user)!;
-  const navigate = useNavigate();
-  const [loggingOut, setLoggingOut] = useState(false);
+  const analyses = useAnalyses();
+  const usage = useUsage();
   const firstName = user.name.split(' ')[0];
-
-  async function handleLogout() {
-    setLoggingOut(true);
-    await logout().catch(() => undefined);
-    navigate('/login', { replace: true });
-  }
+  const latest = analyses.data?.[0];
+  const cvUsage = usage.data?.cvAnalysis;
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-white/10 bg-surface/60 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Logo to="/dashboard" />
-          <div className="flex items-center gap-4">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-medium text-white">{user.name}</p>
-              <p className="text-xs text-slate-400">{user.email}</p>
-            </div>
-            <div
-              aria-hidden
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-500/20 text-sm font-semibold text-brand-200"
+    <div>
+      <p className="text-sm text-brand-300">Dashboard</p>
+      <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-white">
+        Welcome, {firstName} 👋
+      </h1>
+      <p className="mt-2 max-w-2xl text-slate-400">Here's where your job search stands.</p>
+
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <Stat
+          label="Latest CV score"
+          value={latest ? `${latest.overallScore}/100` : 'Not analysed yet'}
+          valueClass={latest ? scoreTone(latest.overallScore).text : undefined}
+        />
+        <Stat
+          label="AI analyses this month"
+          value={
+            cvUsage
+              ? cvUsage.limit === null
+                ? `${cvUsage.used} used`
+                : `${cvUsage.used} of ${cvUsage.limit} used`
+              : '…'
+          }
+        />
+        <Stat label="Plan" value={user.plan === 'pro' ? 'Pro' : 'Free'} />
+      </div>
+
+      <section className="mt-8 rounded-2xl border border-brand-400/30 bg-gradient-to-br from-brand-500/15 to-surface/70 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-white">
+              {latest ? 'Keep improving your CV' : 'Start with your CV'}
+            </h2>
+            <p className="mt-1 max-w-xl text-sm text-slate-300">
+              {latest
+                ? `Your last report for "${latest.resumeTitle}" was on ${formatDate(latest.createdAt)}. Apply the fixes and re-analyze to see your score climb.`
+                : 'Upload your CV and get an ATS score, specific fixes and rewritten bullet points in under a minute.'}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {latest && (
+              <Link
+                to={`/cv/reports/${latest.id}`}
+                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                View last report
+              </Link>
+            )}
+            <Link
+              to="/cv"
+              className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:bg-brand-600"
             >
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <Button variant="secondary" onClick={handleLogout} loading={loggingOut}>
-              Log out
-            </Button>
+              {latest ? 'Open CV Analyzer' : 'Analyze my CV'}
+            </Link>
           </div>
         </div>
-      </header>
+      </section>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <p className="text-sm text-brand-300">Dashboard</p>
-        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-white">
-          Welcome, {firstName} 👋
-        </h1>
-        <p className="mt-2 max-w-2xl text-slate-400">
-          Your account is ready. Ribra's AI tools will appear here as we build each stage.
-        </p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <Stat label="Plan" value={user.plan === 'pro' ? 'Pro' : 'Free'} />
-          <Stat label="Email" value={user.emailVerified ? 'Verified' : 'Not verified yet'} />
-          <Stat
-            label="Member since"
-            value={new Date(user.createdAt).toLocaleDateString(undefined, {
-              month: 'long',
-              year: 'numeric',
-            })}
-          />
-        </div>
-
-        <h2 className="mt-12 font-display text-lg font-semibold text-white">Coming next</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {comingSoon.map((item) => (
-            <div key={item.title} className="rounded-card border border-white/10 bg-surface/70 p-5">
-              <span className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-400">
-                {item.stage}
-              </span>
-              <h3 className="mt-3 font-display text-base font-semibold text-white">{item.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{item.text}</p>
-            </div>
-          ))}
-        </div>
-      </main>
+      <h2 className="mt-12 font-display text-lg font-semibold text-white">Coming next</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        {comingSoon.map((item) => (
+          <div key={item.title} className="rounded-card border border-white/10 bg-surface/70 p-5">
+            <span className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-400">
+              {item.stage}
+            </span>
+            <h3 className="mt-3 font-display text-base font-semibold text-white">{item.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{item.text}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
   return (
     <div className="rounded-card border border-white/10 bg-surface/70 p-5">
       <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 font-display text-lg font-semibold text-white">{value}</p>
+      <p className={cn('mt-1 font-display text-lg font-semibold text-white', valueClass)}>
+        {value}
+      </p>
     </div>
   );
 }

@@ -4,7 +4,7 @@
 
 Ribra scores your CV like an ATS, matches it against real job descriptions, writes tailored cover letters, preps you for interviews and tracks every application on one board.
 
-> Status: **Stage 1 · Accounts** (sign up, log in, secure sessions, protected dashboard)
+> Status: **Stage 3 · AI CV Analyzer** (accounts + upload a CV, get an AI ATS score, feedback and rewritten bullets)
 
 Live: https://ribra.vercel.app
 
@@ -60,7 +60,7 @@ Open http://localhost:5173. The status card shows whether the API and database a
 - [x] Stage 0: Foundation
 - [x] Stage 1: Authentication
 - [ ] Stage 2: App shell and landing page
-- [ ] Stage 3: CV upload and AI analyzer
+- [x] Stage 3: CV upload and AI analyzer
 - [ ] Stage 4: CV vs job match
 - [ ] Stage 5: Application tracker
 - [ ] Stage 6: Cover letters and interview prep

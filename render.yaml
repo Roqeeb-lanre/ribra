@@ -20,3 +20,5 @@ services:
         sync: false
       - key: JWT_ACCESS_SECRET
         generateValue: true
+      - key: AI_API_KEY
+        sync: false

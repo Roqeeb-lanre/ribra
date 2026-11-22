@@ -7,6 +7,8 @@ import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { analysesRouter, resumesRouter } from './modules/resumes/resumes.routes.js';
+import { usageRouter } from './modules/usage/usage.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 /**
@@ -37,6 +39,9 @@ export function createApp() {
   // Routes (every feature module plugs in here as we build it)
   app.use('/api/v1/health', healthRouter);
   app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/resumes', resumesRouter);
+  app.use('/api/v1/analyses', analysesRouter);
+  app.use('/api/v1/usage', usageRouter);
 
   // Errors
   app.use(notFound);

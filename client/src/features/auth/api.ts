@@ -1,4 +1,5 @@
 import { apiRequest, type AuthResponse } from '@/lib/api';
+import { queryClient } from '@/lib/queryClient';
 import { useAuthStore } from '@/stores/auth';
 import type { LoginValues, RegisterValues } from './schemas';
 
@@ -27,5 +28,7 @@ export async function logout() {
     await apiRequest<void>('/auth/logout', { method: 'POST', auth: false });
   } finally {
     useAuthStore.getState().clearSession();
+    // Forget the previous user's CVs and reports so the next person can't see them.
+    queryClient.clear();
   }
 }

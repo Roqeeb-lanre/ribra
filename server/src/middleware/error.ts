@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
+import multer from 'multer';
 import { ZodError } from 'zod';
 import { AppError } from '../utils/AppError.js';
 import { env } from '../config/env.js';
@@ -26,6 +27,20 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
           field: issue.path.join('.'),
           message: issue.message,
         })),
+      },
+    });
+    return;
+  }
+
+  // Upload problems (file too big, wrong field name...)
+  if (err instanceof multer.MulterError) {
+    const tooBig = err.code === 'LIMIT_FILE_SIZE';
+    res.status(tooBig ? 413 : 400).json({
+      error: {
+        code: tooBig ? 'FILE_TOO_LARGE' : 'UPLOAD_ERROR',
+        message: tooBig
+          ? 'That file is too large. The maximum size is 5 MB.'
+          : 'The upload could not be processed.',
       },
     });
     return;

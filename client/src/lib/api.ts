@@ -31,15 +31,17 @@ export type AuthResponse = { user: User; accessToken: string };
 
 async function send(path: string, { method = 'GET', body, auth = true }: RequestOptions) {
   const token = useAuthStore.getState().accessToken;
+  const isFile = body instanceof FormData;
   const headers: Record<string, string> = {};
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  // For file uploads the browser sets the multipart Content-Type (with its boundary) itself.
+  if (body !== undefined && !isFile) headers['Content-Type'] = 'application/json';
   if (auth && token) headers.Authorization = `Bearer ${token}`;
 
   return fetch(`${API_BASE}${path}`, {
     method,
     headers,
     credentials: 'include',
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body === undefined ? undefined : isFile ? body : JSON.stringify(body),
   });
 }
 

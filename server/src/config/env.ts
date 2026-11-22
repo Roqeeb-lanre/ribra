@@ -18,6 +18,20 @@ const envSchema = z.object({
   ),
   ACCESS_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(15),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(7),
+
+  // AI provider (any OpenAI-compatible API). Defaults to Google Gemini's free tier.
+  AI_API_KEY: z.preprocess((value) => (value === '' ? undefined : value), z.string().optional()),
+  AI_BASE_URL: z.string().url().default('https://generativelanguage.googleapis.com/v1beta/openai/'),
+  // Tried in order: if one model is busy or out of free quota, the next one is used.
+  AI_MODELS: z
+    .string()
+    .default(
+      'gemini-3-flash-preview,gemini-3.1-flash-lite,gemini-flash-lite-latest,gemini-flash-latest',
+    ),
+  AI_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(90),
+
+  // Plan limits
+  FREE_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -41,6 +55,10 @@ export const env = {
   isTest: data.NODE_ENV === 'test',
   clientOrigins: data.CLIENT_URL.split(',').map((url) => url.trim()),
   // Local development falls back to a fixed secret so the app runs without extra setup.
+  aiModels: data.AI_MODELS.split(',')
+    .map((m) => m.trim())
+    .filter(Boolean),
+  aiBaseUrl: data.AI_BASE_URL.endsWith('/') ? data.AI_BASE_URL : `${data.AI_BASE_URL}/`,
   jwtAccessSecret:
     data.JWT_ACCESS_SECRET ?? 'ribra-local-development-secret-do-not-use-in-production',
 };

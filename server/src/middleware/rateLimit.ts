@@ -35,3 +35,22 @@ export const registerLimiter = rateLimit({
   limit: 20,
   keyGenerator: ip,
 });
+
+/** Per logged-in user (falls back to IP). Use after requireAuth. */
+const user = (req: Request) => req.auth?.userId ?? ip(req);
+
+/** AI calls are slow and limited by the free tier: max 4 per minute per user. */
+export const aiLimiter = rateLimit({
+  ...common,
+  windowMs: 60 * 1000,
+  limit: 4,
+  keyGenerator: user,
+});
+
+/** 20 CV uploads per hour per user. */
+export const uploadLimiter = rateLimit({
+  ...common,
+  windowMs: 60 * 60 * 1000,
+  limit: 20,
+  keyGenerator: user,
+});

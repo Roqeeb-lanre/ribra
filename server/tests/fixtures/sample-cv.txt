@@ -1,0 +1,21 @@
+Ada Okafor
+Software Engineer | ada.okafor@example.com | +234 803 123 4567 | linkedin.com/in/ada-okafor
+
+SUMMARY
+Full-stack developer with two years of experience building web applications with React, Node.js and MongoDB.
+
+EXPERIENCE
+Junior Developer, Paystack-style Fintech Ltd, Lagos (2024 - Present)
+- Responsible for building pages in React.
+- Worked on the payments API with Node.js and Express.
+- Helped the team fix bugs.
+
+Intern, Afe Babalola University ICT Unit (2023)
+- Maintained the student portal.
+- Wrote documentation.
+
+EDUCATION
+B.Sc. Computer Science, Afe Babalola University, 2024
+
+SKILLS
+JavaScript, TypeScript, React, Node.js, Express, MongoDB, Git, Teamwork, Communication
