@@ -1,0 +1,20 @@
+# Render blueprint for the Ribra API.
+# In Render: New > Blueprint > pick this repo. Then add MONGODB_URI and CLIENT_URL as secrets.
+services:
+  - type: web
+    name: ribra-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm ci --include=dev && npm run build -w server
+    startCommand: npm run start -w server
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
