@@ -18,3 +18,5 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true

@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
+import { ZodError } from 'zod';
 import { AppError } from '../utils/AppError.js';
 import { env } from '../config/env.js';
 import { logger } from '../utils/logger.js';
@@ -8,10 +9,39 @@ export const notFound: RequestHandler = (req, _res, next) => {
   next(new AppError(404, `Route not found: ${req.method} ${req.originalUrl}`, 'NOT_FOUND'));
 };
 
-/** One place that turns every error into the same JSON shape. */
+/** One place that turns every error into the same JSON shape: { error: { code, message, details? } } */
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ error: { code: err.code, message: err.message } });
+    return;
+  }
+
+  // Invalid request body (from validateBody)
+  if (err instanceof ZodError) {
+    res.status(400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: err.issues[0]?.message ?? 'Some fields are invalid.',
+        details: err.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      },
+    });
+    return;
+  }
+
+  // Malformed JSON body
+  if (err?.type === 'entity.parse.failed') {
+    res
+      .status(400)
+      .json({ error: { code: 'INVALID_JSON', message: 'The request body is not valid JSON.' } });
+    return;
+  }
+
+  // MongoDB unique index clash (e.g. two sign-ups with the same email at the same moment)
+  if (err?.code === 11000) {
+    res.status(409).json({ error: { code: 'DUPLICATE', message: 'That record already exists.' } });
     return;
   }
 

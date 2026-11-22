@@ -1,10 +1,12 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { healthRouter } from './modules/health/health.routes.js';
+import { authRouter } from './modules/auth/auth.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 /**
@@ -13,17 +15,28 @@ import { errorHandler, notFound } from './middleware/error.js';
 export function createApp() {
   const app = express();
 
-  // Render sits behind a proxy; this makes req.ip and secure cookies work correctly.
-  app.set('trust proxy', 1);
+  // In production requests pass through two proxies (Vercel, then Render),
+  // so we trust two hops to read the visitor's real IP for rate limiting.
+  app.set('trust proxy', env.isProduction ? 2 : 1);
 
   // Security and parsing
   app.use(helmet());
   app.use(cors({ origin: env.clientOrigins, credentials: true }));
   app.use(express.json({ limit: '1mb' }));
-  app.use(pinoHttp({ logger, autoLogging: !env.isTest }));
+  app.use(cookieParser());
+  app.use(
+    pinoHttp({
+      logger,
+      // Don't log Render's health checks (every few seconds) or anything during tests.
+      autoLogging: env.isTest
+        ? false
+        : { ignore: (req) => req.url?.startsWith('/api/v1/health') ?? false },
+    }),
+  );
 
   // Routes (every feature module plugs in here as we build it)
   app.use('/api/v1/health', healthRouter);
+  app.use('/api/v1/auth', authRouter);
 
   // Errors
   app.use(notFound);

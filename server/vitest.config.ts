@@ -3,6 +3,12 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
-    env: { NODE_ENV: 'test' },
+    env: {
+      NODE_ENV: 'test',
+      JWT_ACCESS_SECRET: 'test-secret-that-is-long-enough-for-validation-123',
+    },
+    // The first run downloads a MongoDB binary for the in-memory test database.
+    hookTimeout: 120_000,
+    testTimeout: 20_000,
   },
 });
