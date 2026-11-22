@@ -14,6 +14,7 @@ import * as usage from '../usage/usage.service.js';
 import { JobMatchModel, toJobMatchSummary, toPublicJobMatch } from './jobMatch.model.js';
 import { combinedMatchScore, keywordCoverage, matchKeywords } from './matchKeywords.js';
 import type { CreateJobMatchInput } from './jobMatches.schema.js';
+import { unlinkJobMatches } from '../applications/applications.service.js';
 
 const notFound = (what: string) => new AppError(404, `${what} not found.`, 'NOT_FOUND');
 
@@ -109,4 +110,5 @@ export async function getJobMatch(userId: string, id: string) {
 export async function deleteJobMatch(userId: string, id: string) {
   const deleted = await JobMatchModel.findOneAndDelete({ _id: objectId(id, 'Job match'), userId });
   if (!deleted) throw notFound('Job match');
+  await unlinkJobMatches(userId, [deleted._id]);
 }

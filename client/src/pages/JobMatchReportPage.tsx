@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { formatDate, scoreTone } from '@/features/cv/score';
 import { useDeleteJobMatch, useJobMatch } from '@/features/jobs/api';
+import { useApplications, useTrackJobMatch } from '@/features/applications/api';
 import type { JobKeyword } from '@/features/jobs/types';
 import { ApiError } from '@/lib/api';
 import { cn } from '@/lib/cn';
@@ -15,6 +16,9 @@ export default function JobMatchReportPage() {
   const navigate = useNavigate();
   const { data: match, isLoading, error } = useJobMatch(id!);
   const remove = useDeleteJobMatch();
+  const applications = useApplications();
+  const track = useTrackJobMatch();
+  const tracked = applications.data?.find((a) => a.jobMatchId === id);
 
   if (isLoading) {
     return (
@@ -37,6 +41,12 @@ export default function JobMatchReportPage() {
   const preferred = match.keywords.filter((k) => k.importance === 'preferred');
   const missingRequired = required.filter((k) => !k.found).length;
 
+  async function handleTrack() {
+    // A failure is shown in the alert under the buttons.
+    const result = await track.mutateAsync(match!.id).catch(() => null);
+    if (result) navigate(`/applications?open=${result.application.id}`);
+  }
+
   async function handleDelete() {
     if (!window.confirm('Delete this job match?')) return;
     await remove.mutateAsync(match!.id);
@@ -47,10 +57,35 @@ export default function JobMatchReportPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <BackLink />
-        <Button variant="ghost" onClick={handleDelete} loading={remove.isPending}>
-          Delete
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" onClick={handleDelete} loading={remove.isPending}>
+            Delete
+          </Button>
+          {tracked ? (
+            <Link
+              to={`/applications?open=${tracked.id}`}
+              className="rounded-lg border border-success/30 bg-success/10 px-4 py-2.5 text-sm font-semibold text-emerald-300 hover:bg-success/15"
+            >
+              ✓ Tracked · View in tracker
+            </Link>
+          ) : (
+            <Button
+              onClick={handleTrack}
+              loading={track.isPending}
+              disabled={applications.isLoading}
+            >
+              Track this job
+            </Button>
+          )}
+        </div>
       </div>
+      {track.isError && (
+        <Alert>
+          {track.error instanceof ApiError
+            ? track.error.message
+            : "We couldn't add this job to your tracker. Please try again."}
+        </Alert>
+      )}
 
       {/* Overview */}
       <section className="grid gap-6 rounded-2xl border border-white/10 bg-surface/70 p-6 md:grid-cols-[auto_1fr] md:items-center md:p-8">

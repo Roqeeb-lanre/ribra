@@ -11,6 +11,7 @@ const links = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/cv', label: 'CV Analyzer' },
   { to: '/jobs', label: 'Job Match' },
+  { to: '/applications', label: 'Tracker' },
 ];
 
 /** Header + navigation shared by every page inside the app. */

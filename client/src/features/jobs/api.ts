@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api';
 import { cvKeys } from '@/features/cv/api';
+import { applicationKeys } from '@/features/applications/api';
 import type { CreateJobMatchInput, JobMatch, JobMatchSummary } from './types';
 
 export const jobKeys = {
@@ -48,6 +49,10 @@ export function useDeleteJobMatch() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => apiRequest<void>(`/job-matches/${id}`, { method: 'DELETE' }),
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: jobKeys.all }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: jobKeys.all });
+      // Tracked applications stay, but lose their link to the deleted match.
+      void queryClient.invalidateQueries({ queryKey: applicationKeys.all });
+    },
   });
 }

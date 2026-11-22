@@ -65,6 +65,7 @@ export function useDeleteResume() {
       void queryClient.invalidateQueries({ queryKey: cvKeys.analyses });
       // Deleting a CV also deletes its job matches on the server.
       void queryClient.invalidateQueries({ queryKey: ['job-matches'] });
+      void queryClient.invalidateQueries({ queryKey: ['applications'] });
     },
   });
 }

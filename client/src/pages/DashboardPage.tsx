@@ -1,12 +1,12 @@
 import { Link } from 'react-router';
 import { useAnalyses, useUsage } from '@/features/cv/api';
 import { useJobMatches } from '@/features/jobs/api';
+import { TrackerSummary } from '@/components/applications/TrackerSummary';
 import { formatDate, scoreTone } from '@/features/cv/score';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/stores/auth';
 
 const comingSoon = [
-  { stage: 'Stage 5', title: 'Application tracker', text: 'Track every application on one board.' },
   {
     stage: 'Stage 6',
     title: 'Cover letters & interview prep',
@@ -105,6 +105,8 @@ export default function DashboardPage() {
           Check a job match
         </Link>
       </section>
+
+      <TrackerSummary />
 
       <h2 className="mt-12 font-display text-lg font-semibold text-white">Coming next</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
