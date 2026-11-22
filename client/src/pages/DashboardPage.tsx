@@ -1,11 +1,11 @@
 import { Link } from 'react-router';
 import { useAnalyses, useUsage } from '@/features/cv/api';
+import { useJobMatches } from '@/features/jobs/api';
 import { formatDate, scoreTone } from '@/features/cv/score';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/stores/auth';
 
 const comingSoon = [
-  { stage: 'Stage 4', title: 'Job match', text: 'Compare your CV with any job description.' },
   { stage: 'Stage 5', title: 'Application tracker', text: 'Track every application on one board.' },
   {
     stage: 'Stage 6',
@@ -17,6 +17,8 @@ const comingSoon = [
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user)!;
   const analyses = useAnalyses();
+  const matches = useJobMatches();
+  const latestMatch = matches.data?.[0];
   const usage = useUsage();
   const firstName = user.name.split(' ')[0];
   const latest = analyses.data?.[0];
@@ -46,7 +48,13 @@ export default function DashboardPage() {
               : '…'
           }
         />
-        <Stat label="Plan" value={user.plan === 'pro' ? 'Pro' : 'Free'} />
+        <Stat
+          label="Latest job match"
+          value={
+            latestMatch ? `${latestMatch.matchScore}% · ${latestMatch.jobTitle}` : 'No matches yet'
+          }
+          valueClass={latestMatch ? scoreTone(latestMatch.matchScore).text : undefined}
+        />
       </div>
 
       <section className="mt-8 rounded-2xl border border-brand-400/30 bg-gradient-to-br from-brand-500/15 to-surface/70 p-6">
@@ -80,8 +88,26 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      <section className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-surface/70 p-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-white">
+            Applying for a specific job?
+          </h2>
+          <p className="mt-1 max-w-xl text-sm text-slate-300">
+            Paste the job description to see your match score, missing keywords and how to tailor
+            your CV.
+          </p>
+        </div>
+        <Link
+          to="/jobs"
+          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+        >
+          Check a job match
+        </Link>
+      </section>
+
       <h2 className="mt-12 font-display text-lg font-semibold text-white">Coming next</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {comingSoon.map((item) => (
           <div key={item.title} className="rounded-card border border-white/10 bg-surface/70 p-5">
             <span className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-400">

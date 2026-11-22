@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth';
 const links = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/cv', label: 'CV Analyzer' },
+  { to: '/jobs', label: 'Job Match' },
 ];
 
 /** Header + navigation shared by every page inside the app. */

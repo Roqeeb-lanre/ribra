@@ -9,6 +9,7 @@ import { healthRouter } from './modules/health/health.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { analysesRouter, resumesRouter } from './modules/resumes/resumes.routes.js';
 import { usageRouter } from './modules/usage/usage.routes.js';
+import { jobMatchesRouter } from './modules/jobMatches/jobMatches.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 /**
@@ -41,6 +42,7 @@ export function createApp() {
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/resumes', resumesRouter);
   app.use('/api/v1/analyses', analysesRouter);
+  app.use('/api/v1/job-matches', jobMatchesRouter);
   app.use('/api/v1/usage', usageRouter);
 
   // Errors

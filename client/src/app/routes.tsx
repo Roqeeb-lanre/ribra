@@ -4,10 +4,15 @@ import { GuestRoute, ProtectedRoute } from '@/components/routing/guards';
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
-import DashboardPage from '@/pages/DashboardPage';
-import CvAnalyzerPage from '@/pages/CvAnalyzerPage';
-import AnalysisReportPage from '@/pages/AnalysisReportPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+
+/**
+ * Pages inside the app are loaded only when first visited (code-splitting),
+ * so the landing and login pages download fast.
+ */
+const page = (load: () => Promise<{ default: React.ComponentType }>) => async () => ({
+  Component: (await load()).default,
+});
 
 export const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
@@ -24,9 +29,11 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { path: '/dashboard', element: <DashboardPage /> },
-          { path: '/cv', element: <CvAnalyzerPage /> },
-          { path: '/cv/reports/:id', element: <AnalysisReportPage /> },
+          { path: '/dashboard', lazy: page(() => import('@/pages/DashboardPage')) },
+          { path: '/cv', lazy: page(() => import('@/pages/CvAnalyzerPage')) },
+          { path: '/cv/reports/:id', lazy: page(() => import('@/pages/AnalysisReportPage')) },
+          { path: '/jobs', lazy: page(() => import('@/pages/JobMatchPage')) },
+          { path: '/jobs/:id', lazy: page(() => import('@/pages/JobMatchReportPage')) },
         ],
       },
     ],

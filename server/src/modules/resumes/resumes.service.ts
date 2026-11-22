@@ -12,6 +12,7 @@ import * as usage from '../usage/usage.service.js';
 import { ResumeModel, toPublicResume } from './resume.model.js';
 import { AnalysisModel, toAnalysisSummary, toPublicAnalysis } from './analysis.model.js';
 import { detectFileType, extractResumeText } from './extractText.js';
+import { JobMatchModel } from '../jobMatches/jobMatch.model.js';
 
 export const MAX_SAVED_RESUMES = 10;
 
@@ -83,7 +84,10 @@ export async function deleteResume(userId: string, resumeId: string) {
   const _id = objectId(resumeId, 'CV');
   const deleted = await ResumeModel.findOneAndDelete({ _id, userId });
   if (!deleted) throw notFound('CV');
-  await AnalysisModel.deleteMany({ resumeId: _id, userId });
+  await Promise.all([
+    AnalysisModel.deleteMany({ resumeId: _id, userId }),
+    JobMatchModel.deleteMany({ resumeId: _id, userId }),
+  ]);
 }
 
 export async function analyzeResume(userId: string, resumeId: string, targetRole?: string) {

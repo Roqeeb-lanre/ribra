@@ -34,5 +34,8 @@ export type Analysis = AnalysisSummary & {
 export type Usage = {
   period: string;
   plan: 'free' | 'pro';
-  cvAnalysis: { used: number; limit: number | null; remaining: number | null };
+  cvAnalysis: UsageCounter;
+  jobMatch: UsageCounter;
 };
+
+export type UsageCounter = { used: number; limit: number | null; remaining: number | null };

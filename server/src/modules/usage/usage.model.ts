@@ -10,6 +10,7 @@ const usageSchema = new Schema(
     period: { type: String, required: true }, // "2026-11"
     counts: {
       cvAnalysis: { type: Number },
+      jobMatch: { type: Number },
     },
     tokens: { type: Number },
   },

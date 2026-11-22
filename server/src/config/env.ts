@@ -32,6 +32,7 @@ const envSchema = z.object({
 
   // Plan limits
   FREE_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
+  FREE_JOB_MATCHES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
 });
 
 const parsed = envSchema.safeParse(process.env);

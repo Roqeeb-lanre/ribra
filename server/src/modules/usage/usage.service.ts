@@ -3,7 +3,7 @@ import { env } from '../../config/env.js';
 import { AppError } from '../../utils/AppError.js';
 import { UsageModel } from './usage.model.js';
 
-export type Feature = 'cvAnalysis';
+export type Feature = 'cvAnalysis' | 'jobMatch';
 type Plan = 'free' | 'pro';
 
 export function currentPeriod(date = new Date()): string {
@@ -13,7 +13,10 @@ export function currentPeriod(date = new Date()): string {
 /** Monthly limit per plan. null = unlimited. */
 export function limitFor(feature: Feature, plan: Plan): number | null {
   if (plan === 'pro') return null;
-  const limits: Record<Feature, number> = { cvAnalysis: env.FREE_CV_ANALYSES_PER_MONTH };
+  const limits: Record<Feature, number> = {
+    cvAnalysis: env.FREE_CV_ANALYSES_PER_MONTH,
+    jobMatch: env.FREE_JOB_MATCHES_PER_MONTH,
+  };
   return limits[feature];
 }
 
@@ -51,9 +54,10 @@ export async function reserveUse(userId: string, plan: Plan, feature: Feature): 
     );
   } catch (err) {
     if ((err as { code?: number }).code === 11000) {
+      const what = feature === 'cvAnalysis' ? 'CV analyses' : 'job matches';
       throw new AppError(
         403,
-        `You've used all ${limit} free CV analyses for this month. They reset on the 1st.`,
+        `You've used all ${limit} free ${what} for this month. They reset on the 1st.`,
         'PLAN_LIMIT_REACHED',
       );
     }
@@ -80,12 +84,11 @@ export async function recordTokens(userId: string, tokens: number | null): Promi
 export async function getUsageSummary(userId: string, plan: Plan) {
   const period = currentPeriod();
   const doc = await UsageModel.findOne({ userId: new Types.ObjectId(userId), period }).lean();
-  const used = doc?.counts?.cvAnalysis ?? 0;
-  const limit = limitFor('cvAnalysis', plan);
-
-  return {
-    period,
-    plan,
-    cvAnalysis: { used, limit, remaining: limit === null ? null : Math.max(limit - used, 0) },
+  const summarise = (feature: Feature) => {
+    const used = doc?.counts?.[feature] ?? 0;
+    const limit = limitFor(feature, plan);
+    return { used, limit, remaining: limit === null ? null : Math.max(limit - used, 0) };
   };
+
+  return { period, plan, cvAnalysis: summarise('cvAnalysis'), jobMatch: summarise('jobMatch') };
 }

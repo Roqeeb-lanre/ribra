@@ -1,8 +1,9 @@
-import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { ScoreRing } from '@/components/cv/ScoreRing';
 import { Alert } from '@/components/ui/Alert';
 import { Spinner } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { CopyButton } from '@/components/ui/CopyButton';
 import { useAnalysis } from '@/features/cv/api';
 import { formatDate, scoreTone } from '@/features/cv/score';
 import type { Analysis } from '@/features/cv/types';
@@ -229,24 +230,6 @@ function BackLink() {
   );
 }
 
-function Card({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-2xl border border-white/10 bg-surface/70 p-6">
-      <h2 className="font-display text-lg font-semibold text-white">{title}</h2>
-      {subtitle && <p className="mt-1 text-sm text-slate-400">{subtitle}</p>}
-      <div className="mt-5">{children}</div>
-    </section>
-  );
-}
-
 function SkillGroup({
   label,
   skills,
@@ -268,23 +251,5 @@ function SkillGroup({
         ))}
       </div>
     </div>
-  );
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        void navigator.clipboard.writeText(text).then(() => {
-          setCopied(true);
-          window.setTimeout(() => setCopied(false), 1500);
-        });
-      }}
-      className="text-xs font-medium text-slate-400 hover:text-white"
-    >
-      {copied ? 'Copied' : 'Copy'}
-    </button>
   );
 }
