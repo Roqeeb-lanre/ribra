@@ -9,6 +9,8 @@ const userSchema = new Schema(
     role: { type: String, enum: ['user', 'admin'], default: 'user', required: true },
     emailVerified: { type: Boolean, default: false, required: true },
     avatarUrl: { type: String },
+    // Set when the user signs in with Google. Sparse: only users who did have one.
+    googleId: { type: String, unique: true, sparse: true },
     plan: { type: String, enum: ['free', 'pro'], default: 'free', required: true },
     lastLoginAt: { type: Date },
   },
@@ -31,6 +33,8 @@ export function toPublicUser(user: UserDocument) {
     emailVerified: user.emailVerified,
     avatarUrl: user.avatarUrl ?? null,
     plan: user.plan,
+    hasPassword: Boolean(user.passwordHash),
+    googleLinked: Boolean(user.googleId),
     createdAt: user.createdAt,
   };
 }

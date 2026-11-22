@@ -30,6 +30,21 @@ const envSchema = z.object({
     ),
   AI_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(90),
 
+  // The website's public address, used in email links. Defaults to the first CLIENT_URL.
+  APP_URL: z.preprocess((v) => (v === '' ? undefined : v), z.string().url().optional()),
+
+  // Emails are sent with Brevo's HTTP API (Render's free plan blocks SMTP ports).
+  // Without BREVO_API_KEY, emails are printed to the server log instead (fine for local development).
+  BREVO_API_KEY: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
+  EMAIL_FROM_ADDRESS: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().email().optional(),
+  ),
+  EMAIL_FROM_NAME: z.string().default('Ribra'),
+
+  // "Sign in with Google" (OAuth client ID from Google Cloud). Optional: the button is hidden without it.
+  GOOGLE_CLIENT_ID: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
+
   // Plan limits
   FREE_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
   FREE_JOB_MATCHES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
@@ -56,6 +71,7 @@ export const env = {
   isTest: data.NODE_ENV === 'test',
   clientOrigins: data.CLIENT_URL.split(',').map((url) => url.trim()),
   // Local development falls back to a fixed secret so the app runs without extra setup.
+  appUrl: (data.APP_URL ?? data.CLIENT_URL.split(',')[0]!.trim()).replace(/\/$/, ''),
   aiModels: data.AI_MODELS.split(',')
     .map((m) => m.trim())
     .filter(Boolean),

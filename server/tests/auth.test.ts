@@ -96,7 +96,11 @@ describe('GET /api/v1/auth/me', () => {
       .set('Authorization', `Bearer ${body.accessToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.user.email).toBe('ada@example.com');
+    expect(res.body.user).toMatchObject({
+      email: 'ada@example.com',
+      hasPassword: true,
+      googleLinked: false,
+    });
   });
 
   it('rejects requests without a token', async () => {

@@ -14,16 +14,24 @@ export const passwordRules = [
   { label: 'At least one number', test: (v: string) => /[0-9]/.test(v) },
 ] as const;
 
+const newPassword = z
+  .string()
+  .min(8, 'Use at least 8 characters')
+  .max(72, 'Use 72 characters or fewer')
+  .regex(/[A-Za-z]/, 'Include at least one letter')
+  .regex(/[0-9]/, 'Include at least one number');
+
 export const registerSchema = z.object({
   name: z.string().trim().min(2, 'Enter your full name').max(80, 'Name is too long'),
   email,
-  password: z
-    .string()
-    .min(8, 'Use at least 8 characters')
-    .max(72, 'Use 72 characters or fewer')
-    .regex(/[A-Za-z]/, 'Include at least one letter')
-    .regex(/[0-9]/, 'Include at least one number'),
+  password: newPassword,
 });
+
+export const forgotPasswordSchema = z.object({ email });
+
+export const resetPasswordSchema = z
+  .object({ password: newPassword, confirm: z.string() })
+  .refine((v) => v.password === v.confirm, { message: "Passwords don't match", path: ['confirm'] });
 
 export const loginSchema = z.object({
   email,
@@ -32,3 +40,5 @@ export const loginSchema = z.object({
 
 export type RegisterValues = z.infer<typeof registerSchema>;
 export type LoginValues = z.infer<typeof loginSchema>;
+export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

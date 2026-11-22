@@ -22,3 +22,14 @@ export const loginSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+
+export const emailOnlySchema = z.object({ email });
+
+export const tokenSchema = z.object({ token: z.string().min(10).max(200) });
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(10).max(200),
+  password: passwordSchema,
+});
+
+export const googleSchema = z.object({ credential: z.string().min(20).max(5000) });

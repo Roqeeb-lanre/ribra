@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loginSchema, passwordRules, registerSchema } from './schemas';
+import { loginSchema, passwordRules, registerSchema, resetPasswordSchema } from './schemas';
 
 describe('registerSchema', () => {
   it('accepts a valid sign-up', () => {
@@ -37,5 +37,22 @@ describe('passwordRules', () => {
   it('marks each rule as met or not', () => {
     const met = passwordRules.map((rule) => rule.test('abc12345'));
     expect(met).toEqual([true, true, true]);
+  });
+});
+
+describe('resetPasswordSchema', () => {
+  it('requires both passwords to match', () => {
+    const result = resetPasswordSchema.safeParse({
+      password: 'newPassword2',
+      confirm: 'newPassword3',
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['confirm']);
+  });
+
+  it('accepts a strong, matching password', () => {
+    expect(
+      resetPasswordSchema.safeParse({ password: 'newPassword2', confirm: 'newPassword2' }).success,
+    ).toBe(true);
   });
 });

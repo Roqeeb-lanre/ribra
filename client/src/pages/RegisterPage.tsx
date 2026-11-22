@@ -1,7 +1,8 @@
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { GoogleButton } from '@/components/auth/GoogleButton';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
@@ -14,6 +15,7 @@ import { cn } from '@/lib/cn';
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string | null>(null);
+  const onGoogleError = useCallback((message: string) => setFormError(message), []);
 
   const {
     register,
@@ -51,6 +53,8 @@ export default function RegisterPage() {
         </>
       }
     >
+      <GoogleButton onError={onGoogleError} />
+
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         {formError && <Alert>{formError}</Alert>}
 

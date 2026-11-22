@@ -104,3 +104,8 @@ export function refreshSession(): Promise<string | null> {
 
   return refreshing;
 }
+
+/** Resolves once any session restore that is in progress has finished. */
+export function waitForSessionRestore(): Promise<unknown> {
+  return refreshing ?? Promise.resolve();
+}

@@ -47,3 +47,36 @@ export async function me(req: Request, res: Response) {
   const user = await authService.getCurrentUser(req.auth!.userId);
   res.json({ user });
 }
+
+export async function verifyEmail(req: Request, res: Response) {
+  const user = await authService.verifyEmail((req.body as { token: string }).token);
+  res.json({ user });
+}
+
+export async function resendVerification(req: Request, res: Response) {
+  res.json(await authService.resendVerification(req.auth!.userId));
+}
+
+export async function forgotPassword(req: Request, res: Response) {
+  await authService.requestPasswordReset((req.body as { email: string }).email);
+  // Same answer whether or not the account exists.
+  res.json({ message: 'If an account exists for that email, we have sent a reset link.' });
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  const { token, password } = req.body as { token: string; password: string };
+  await authService.resetPassword(token, password);
+  clearRefreshCookie(res);
+  res.json({ message: 'Your password has been changed. Please log in.' });
+}
+
+export async function google(req: Request, res: Response) {
+  const { isNewUser, ...result } = await authService.googleSignIn(
+    (req.body as { credential: string }).credential,
+    clientMeta(req),
+  );
+  setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+  res
+    .status(isNewUser ? 201 : 200)
+    .json({ user: result.user, accessToken: result.accessToken, isNewUser });
+}

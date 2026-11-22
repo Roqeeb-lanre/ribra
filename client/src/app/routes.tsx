@@ -21,8 +21,12 @@ export const router = createBrowserRouter([
     children: [
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
+      { path: '/forgot-password', lazy: page(() => import('@/pages/ForgotPasswordPage')) },
     ],
   },
+  // Opened from email links: work whether or not someone is logged in.
+  { path: '/verify-email', lazy: page(() => import('@/pages/VerifyEmailPage')) },
+  { path: '/reset-password', lazy: page(() => import('@/pages/ResetPasswordPage')) },
   {
     element: <ProtectedRoute />,
     children: [

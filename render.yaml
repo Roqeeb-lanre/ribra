@@ -22,3 +22,11 @@ services:
         generateValue: true
       - key: AI_API_KEY
         sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM_ADDRESS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: APP_URL
+        value: https://ribra.vercel.app

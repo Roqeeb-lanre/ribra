@@ -8,6 +8,8 @@ export type User = {
   emailVerified: boolean;
   avatarUrl: string | null;
   plan: 'free' | 'pro';
+  hasPassword: boolean;
+  googleLinked: boolean;
   createdAt: string;
 };
 
@@ -18,6 +20,7 @@ type AuthState = {
   /** "checking" while we try to restore the session when the app first loads. */
   status: 'checking' | 'authenticated' | 'guest';
   setSession: (user: User, accessToken: string) => void;
+  setUser: (user: User) => void;
   clearSession: () => void;
 };
 
@@ -26,5 +29,6 @@ export const useAuthStore = create<AuthState>()((set) => ({
   accessToken: null,
   status: 'checking',
   setSession: (user, accessToken) => set({ user, accessToken, status: 'authenticated' }),
+  setUser: (user) => set((state) => (state.accessToken ? { user } : state)),
   clearSession: () => set({ user: null, accessToken: null, status: 'guest' }),
 }));

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useLocation, useNavigate } from 'react-router';
+import { GoogleButton } from '@/components/auth/GoogleButton';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
@@ -14,8 +15,10 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   // If the user was sent here from a protected page, go back there after logging in.
-  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
+  const state = location.state as { from?: string; notice?: string } | null;
+  const from = state?.from ?? '/dashboard';
   const [formError, setFormError] = useState<string | null>(null);
+  const onGoogleError = useCallback((message: string) => setFormError(message), []);
 
   const {
     register,
@@ -50,6 +53,16 @@ export default function LoginPage() {
         </>
       }
     >
+      {state?.notice && (
+        <p
+          role="status"
+          className="mb-5 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-emerald-200"
+        >
+          {state.notice}
+        </p>
+      )}
+      <GoogleButton onError={onGoogleError} />
+
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         {formError && <Alert>{formError}</Alert>}
 
@@ -69,6 +82,14 @@ export default function LoginPage() {
           error={errors.password?.message}
           {...register('password')}
         />
+        <div className="-mt-2 text-right">
+          <Link
+            to="/forgot-password"
+            className="text-xs font-medium text-brand-300 hover:text-brand-200"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         <Button type="submit" loading={isSubmitting} className="w-full">
           Log in

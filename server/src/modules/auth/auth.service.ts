@@ -12,6 +12,12 @@ import {
 import { SessionModel } from './session.model.js';
 import type { LoginInput, RegisterInput } from './auth.schema.js';
 import {
+  consumeEmailToken,
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from './accountEmails.js';
+import { verifyGoogleIdToken } from './google.js';
+import {
   createRefreshToken,
   hashToken,
   hashesMatch,
@@ -35,7 +41,7 @@ export type AuthResult = {
   refreshTokenExpiresAt: Date;
 };
 
-async function startSession(user: UserDocument, meta: ClientMeta): Promise<AuthResult> {
+export async function startSession(user: UserDocument, meta: ClientMeta): Promise<AuthResult> {
   const sessionId = new Types.ObjectId();
   const refreshToken = createRefreshToken(sessionId.toString());
   const expiresAt = refreshTokenExpiry();
@@ -71,6 +77,7 @@ export async function register(input: RegisterInput, meta: ClientMeta): Promise<
   });
 
   logger.info({ userId: user.id }, 'User registered');
+  await sendVerificationEmail(user);
   return startSession(user, meta);
 }
 
@@ -78,6 +85,13 @@ export async function login(input: LoginInput, meta: ClientMeta): Promise<AuthRe
   const user = await UserModel.findOne({ email: input.email }).select('+passwordHash');
 
   const passwordOk = await bcrypt.compare(input.password, user?.passwordHash ?? DUMMY_HASH);
+  if (user && !user.passwordHash && user.googleId) {
+    throw new AppError(
+      401,
+      'This account uses Google sign-in. Click "Continue with Google".',
+      'USE_GOOGLE_SIGN_IN',
+    );
+  }
   if (!user || !user.passwordHash || !passwordOk) {
     throw new AppError(401, 'Incorrect email or password.', 'INVALID_CREDENTIALS');
   }
@@ -120,7 +134,7 @@ export async function refresh(refreshToken: string | undefined): Promise<AuthRes
     throw invalid;
   }
 
-  const user = await UserModel.findById(session.userId);
+  const user = await UserModel.findById(session.userId).select('+passwordHash');
   if (!user) {
     await session.deleteOne();
     throw invalid;
@@ -150,7 +164,122 @@ export async function logout(refreshToken: string | undefined): Promise<void> {
 }
 
 export async function getCurrentUser(userId: string): Promise<PublicUser> {
-  const user = Types.ObjectId.isValid(userId) ? await UserModel.findById(userId) : null;
+  const user = Types.ObjectId.isValid(userId)
+    ? await UserModel.findById(userId).select('+passwordHash')
+    : null;
   if (!user) throw new AppError(401, 'You need to log in.', 'UNAUTHORIZED');
   return toPublicUser(user);
+}
+
+// ---------------------------------------------------------------------------
+// Email verification
+// ---------------------------------------------------------------------------
+
+export async function verifyEmail(token: string): Promise<PublicUser> {
+  const userId = await consumeEmailToken(token, 'verify_email');
+  if (!userId) {
+    throw new AppError(
+      400,
+      'This confirmation link is invalid or has expired. Request a new one.',
+      'TOKEN_INVALID',
+    );
+  }
+  const user = await UserModel.findByIdAndUpdate(
+    userId,
+    { emailVerified: true },
+    { new: true },
+  ).select('+passwordHash');
+  if (!user) throw new AppError(400, 'This confirmation link is invalid.', 'TOKEN_INVALID');
+  return toPublicUser(user);
+}
+
+export async function resendVerification(userId: string): Promise<{ alreadyVerified: boolean }> {
+  const user = await UserModel.findById(userId);
+  if (!user) throw new AppError(401, 'You need to log in.', 'UNAUTHORIZED');
+  if (user.emailVerified) return { alreadyVerified: true };
+  await sendVerificationEmail(user);
+  return { alreadyVerified: false };
+}
+
+// ---------------------------------------------------------------------------
+// Password reset
+// ---------------------------------------------------------------------------
+
+/**
+ * Always "succeeds" from the caller's point of view, so nobody can use this form
+ * to find out which emails have Ribra accounts.
+ */
+export async function requestPasswordReset(email: string): Promise<void> {
+  const user = await UserModel.findOne({ email });
+  if (user) await sendPasswordResetEmail(user);
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  const userId = await consumeEmailToken(token, 'reset_password');
+  if (!userId) {
+    throw new AppError(
+      400,
+      'This reset link is invalid or has expired. Request a new one.',
+      'TOKEN_INVALID',
+    );
+  }
+  await UserModel.updateOne(
+    { _id: userId },
+    // Clicking the emailed link also proves they own the address.
+    { passwordHash: await bcrypt.hash(newPassword, BCRYPT_ROUNDS), emailVerified: true },
+  );
+  // Log out every device: if someone else knew the old password, they're out now.
+  await SessionModel.deleteMany({ userId });
+  logger.info({ userId: userId.toString() }, 'Password reset');
+}
+
+// ---------------------------------------------------------------------------
+// Google sign-in
+// ---------------------------------------------------------------------------
+
+/**
+ * Signs in (or signs up) with a Google ID token.
+ * If an account with the same verified email already exists, Google is linked to it.
+ */
+export async function googleSignIn(
+  credential: string,
+  meta: ClientMeta,
+): Promise<AuthResult & { isNewUser: boolean }> {
+  const profile = await verifyGoogleIdToken(credential);
+  if (!profile.emailVerified) {
+    throw new AppError(
+      401,
+      'Your Google email address is not verified.',
+      'GOOGLE_EMAIL_UNVERIFIED',
+    );
+  }
+
+  // passwordHash is hidden by default; load it so the profile can say whether a password is set.
+  let user = await UserModel.findOne({ googleId: profile.googleId }).select('+passwordHash');
+  let isNewUser = false;
+
+  if (!user) {
+    user = await UserModel.findOne({ email: profile.email }).select('+passwordHash');
+    if (user) {
+      // Existing email/password account: link Google to it.
+      user.googleId = profile.googleId;
+      user.emailVerified = true;
+      if (!user.avatarUrl && profile.picture) user.avatarUrl = profile.picture;
+    } else {
+      user = new UserModel({
+        name: profile.name.slice(0, 80),
+        email: profile.email,
+        googleId: profile.googleId,
+        avatarUrl: profile.picture,
+        emailVerified: true,
+      });
+      isNewUser = true;
+    }
+  }
+
+  user.lastLoginAt = new Date();
+  await user.save();
+  logger.info({ userId: user.id, isNewUser }, 'Google sign-in');
+
+  return { ...(await startSession(user, meta)), isNewUser };
 }

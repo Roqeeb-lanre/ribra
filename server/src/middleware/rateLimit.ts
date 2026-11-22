@@ -54,3 +54,11 @@ export const uploadLimiter = rateLimit({
   limit: 20,
   keyGenerator: user,
 });
+
+/** Emails cost money and can be abused for spam: 5 per hour per IP (and per user when logged in). */
+export const emailLimiter = rateLimit({
+  ...common,
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  keyGenerator: (req) => `${user(req)}:${String(req.body?.email ?? '').toLowerCase()}`,
+});

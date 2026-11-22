@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
+import { VerifyEmailBanner } from '@/components/auth/VerifyEmailBanner';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
 import { logout } from '@/features/auth/api';
@@ -84,6 +85,7 @@ export function AppLayout() {
             </NavLink>
           ))}
         </nav>
+        <VerifyEmailBanner />
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-10">
