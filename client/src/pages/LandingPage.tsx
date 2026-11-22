@@ -108,6 +108,18 @@ export default function LandingPage() {
 
         <StatusCard status={status} />
       </main>
+
+      <footer className="relative mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 border-t border-white/5 px-6 py-8 text-xs text-slate-500 sm:flex-row">
+        <span>© {new Date().getFullYear()} Ribra</span>
+        <nav className="flex gap-5">
+          <Link to="/privacy" className="hover:text-slate-300">
+            Privacy Policy
+          </Link>
+          <Link to="/terms" className="hover:text-slate-300">
+            Terms of Service
+          </Link>
+        </nav>
+      </footer>
     </div>
   );
 }

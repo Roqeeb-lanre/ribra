@@ -106,7 +106,15 @@ export default function RegisterPage() {
         </Button>
 
         <p className="text-center text-xs text-slate-500">
-          By creating an account you agree to Ribra's Terms and Privacy Policy.
+          By creating an account you agree to Ribra's{' '}
+          <Link to="/terms" className="text-slate-400 underline hover:text-white">
+            Terms
+          </Link>{' '}
+          and{' '}
+          <Link to="/privacy" className="text-slate-400 underline hover:text-white">
+            Privacy Policy
+          </Link>
+          .
         </p>
       </form>
     </AuthLayout>
