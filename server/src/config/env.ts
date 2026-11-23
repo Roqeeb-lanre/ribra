@@ -48,6 +48,10 @@ const envSchema = z.object({
   // Plan limits
   FREE_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
   FREE_JOB_MATCHES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
+  FREE_COVER_LETTERS_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
+  FREE_INTERVIEW_PREPS_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
+  // Feedback on one practice answer is a small AI call, so the free plan gets more of them.
+  FREE_ANSWER_FEEDBACK_PER_MONTH: z.coerce.number().int().nonnegative().default(30),
 });
 
 const parsed = envSchema.safeParse(process.env);

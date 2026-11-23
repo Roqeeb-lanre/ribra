@@ -10,6 +10,9 @@ export default defineConfig({
       AI_MODELS: 'model-a,model-b',
       FREE_CV_ANALYSES_PER_MONTH: '5',
       FREE_JOB_MATCHES_PER_MONTH: '5',
+      FREE_COVER_LETTERS_PER_MONTH: '5',
+      FREE_INTERVIEW_PREPS_PER_MONTH: '5',
+      FREE_ANSWER_FEEDBACK_PER_MONTH: '30',
     },
     // The first run downloads a MongoDB binary for the in-memory test database.
     hookTimeout: 120_000,

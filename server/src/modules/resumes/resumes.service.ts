@@ -13,7 +13,7 @@ import { ResumeModel, toPublicResume } from './resume.model.js';
 import { AnalysisModel, toAnalysisSummary, toPublicAnalysis } from './analysis.model.js';
 import { detectFileType, extractResumeText } from './extractText.js';
 import { JobMatchModel } from '../jobMatches/jobMatch.model.js';
-import { unlinkJobMatches } from '../applications/applications.service.js';
+import { cleanUpAfterMatches } from '../jobMatches/jobMatches.service.js';
 
 export const MAX_SAVED_RESUMES = 10;
 
@@ -85,12 +85,12 @@ export async function deleteResume(userId: string, resumeId: string) {
   const _id = objectId(resumeId, 'CV');
   const deleted = await ResumeModel.findOneAndDelete({ _id, userId });
   if (!deleted) throw notFound('CV');
-  // Applications made from this CV's job matches are kept, just unlinked.
+  // Cover letters and interview prep for this CV's matches go too; applications are kept, unlinked.
   const matchIds = await JobMatchModel.find({ resumeId: _id, userId }).distinct('_id');
   await Promise.all([
     AnalysisModel.deleteMany({ resumeId: _id, userId }),
     JobMatchModel.deleteMany({ resumeId: _id, userId }),
-    unlinkJobMatches(userId, matchIds),
+    cleanUpAfterMatches(userId, matchIds),
   ]);
 }
 

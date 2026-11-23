@@ -11,6 +11,9 @@ const usageSchema = new Schema(
     counts: {
       cvAnalysis: { type: Number },
       jobMatch: { type: Number },
+      coverLetter: { type: Number },
+      interviewPrep: { type: Number },
+      answerFeedback: { type: Number },
     },
     tokens: { type: Number },
   },

@@ -41,6 +41,15 @@ export const router = createBrowserRouter([
           { path: '/cv/reports/:id', lazy: page(() => import('@/pages/AnalysisReportPage')) },
           { path: '/jobs', lazy: page(() => import('@/pages/JobMatchPage')) },
           { path: '/jobs/:id', lazy: page(() => import('@/pages/JobMatchReportPage')) },
+          {
+            path: '/jobs/:id/cover-letter',
+            lazy: page(() => import('@/pages/CoverLetterPage')),
+          },
+          {
+            path: '/jobs/:id/interview',
+            lazy: page(() => import('@/pages/InterviewPrepPage')),
+          },
+          { path: '/prep', lazy: page(() => import('@/pages/PrepPage')) },
           { path: '/applications', lazy: page(() => import('@/pages/ApplicationsPage')) },
         ],
       },

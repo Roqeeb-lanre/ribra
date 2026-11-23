@@ -127,12 +127,26 @@ export function ApplicationDialog({ application, defaultStatus, onClose }: Props
               {isEdit ? 'Edit job' : 'Add a job'}
             </h2>
             {application?.jobMatchId && (
-              <Link
-                to={`/jobs/${application.jobMatchId}`}
-                className="text-xs text-brand-300 hover:text-brand-200"
-              >
-                View job match report ({application.matchScore}% match) →
-              </Link>
+              <p className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                <Link
+                  to={`/jobs/${application.jobMatchId}`}
+                  className="text-brand-300 hover:text-brand-200"
+                >
+                  Match report ({application.matchScore}%)
+                </Link>
+                <Link
+                  to={`/jobs/${application.jobMatchId}/cover-letter`}
+                  className="text-brand-300 hover:text-brand-200"
+                >
+                  Cover letter
+                </Link>
+                <Link
+                  to={`/jobs/${application.jobMatchId}/interview`}
+                  className="text-brand-300 hover:text-brand-200"
+                >
+                  Interview prep
+                </Link>
+              </p>
             )}
           </div>
           <button

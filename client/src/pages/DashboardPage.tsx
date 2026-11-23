@@ -6,14 +6,6 @@ import { formatDate, scoreTone } from '@/features/cv/score';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/stores/auth';
 
-const comingSoon = [
-  {
-    stage: 'Stage 6',
-    title: 'Cover letters & interview prep',
-    text: 'Tailored letters and practice questions.',
-  },
-];
-
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user)!;
   const analyses = useAnalyses();
@@ -108,18 +100,23 @@ export default function DashboardPage() {
 
       <TrackerSummary />
 
-      <h2 className="mt-12 font-display text-lg font-semibold text-white">Coming next</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        {comingSoon.map((item) => (
-          <div key={item.title} className="rounded-card border border-white/10 bg-surface/70 p-5">
-            <span className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-400">
-              {item.stage}
-            </span>
-            <h3 className="mt-3 font-display text-base font-semibold text-white">{item.title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{item.text}</p>
-          </div>
-        ))}
-      </div>
+      <section className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-surface/70 p-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-white">
+            Got an interview coming up?
+          </h2>
+          <p className="mt-1 max-w-xl text-sm text-slate-300">
+            Write a tailored cover letter and practise the questions you're likely to be asked, with
+            feedback on every answer.
+          </p>
+        </div>
+        <Link
+          to="/prep"
+          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+        >
+          Open Prep
+        </Link>
+      </section>
     </div>
   );
 }

@@ -114,6 +114,20 @@ export default function JobMatchReportPage() {
         </div>
       </section>
 
+      {/* Next steps */}
+      <section className="grid gap-4 md:grid-cols-2">
+        <NextStep
+          to={`/jobs/${match.id}/cover-letter`}
+          title="Write a cover letter"
+          text="A tailored letter for this job, from the real experience in your CV."
+        />
+        <NextStep
+          to={`/jobs/${match.id}/interview`}
+          title="Prepare for the interview"
+          text="Likely questions for this role, tips, and feedback on your practice answers."
+        />
+      </section>
+
       {/* Keywords */}
       <Card
         title="Keywords recruiters will scan for"
@@ -183,6 +197,21 @@ export default function JobMatchReportPage() {
         Analysed by {match.model}.
       </p>
     </div>
+  );
+}
+
+function NextStep({ to, title, text }: { to: string; title: string; text: string }) {
+  return (
+    <Link
+      to={to}
+      className="group rounded-2xl border border-brand-400/25 bg-gradient-to-br from-brand-500/10 to-surface/70 p-5 transition hover:border-brand-400/60"
+    >
+      <p className="flex items-center justify-between font-display text-base font-semibold text-white">
+        {title}
+        <span className="text-brand-300 transition group-hover:translate-x-0.5">→</span>
+      </p>
+      <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{text}</p>
+    </Link>
   );
 }
 

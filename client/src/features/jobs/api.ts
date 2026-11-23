@@ -53,6 +53,9 @@ export function useDeleteJobMatch() {
       void queryClient.invalidateQueries({ queryKey: jobKeys.all });
       // Tracked applications stay, but lose their link to the deleted match.
       void queryClient.invalidateQueries({ queryKey: applicationKeys.all });
+      // Its cover letter and interview prep are deleted with it.
+      void queryClient.invalidateQueries({ queryKey: ['cover-letters'] });
+      void queryClient.invalidateQueries({ queryKey: ['interview-preps'] });
     },
   });
 }

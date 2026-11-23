@@ -12,6 +12,7 @@ const links = [
   { to: '/cv', label: 'CV Analyzer' },
   { to: '/jobs', label: 'Job Match' },
   { to: '/applications', label: 'Tracker' },
+  { to: '/prep', label: 'Prep' },
 ];
 
 /** Header + navigation shared by every page inside the app. */
@@ -70,14 +71,14 @@ export function AppLayout() {
         </div>
 
         {/* Mobile navigation */}
-        <nav className="flex gap-1 border-t border-white/5 px-4 py-2 sm:hidden">
+        <nav className="flex gap-1 overflow-x-auto border-t border-white/5 px-4 py-2 sm:hidden">
           {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
                 cn(
-                  'flex-1 rounded-lg px-3 py-2 text-center text-sm',
+                  'shrink-0 rounded-lg px-3 py-2 text-center text-sm whitespace-nowrap',
                   isActive ? 'bg-white/10 text-white' : 'text-slate-400',
                 )
               }

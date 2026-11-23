@@ -3,7 +3,23 @@ import { env } from '../../config/env.js';
 import { AppError } from '../../utils/AppError.js';
 import { UsageModel } from './usage.model.js';
 
-export type Feature = 'cvAnalysis' | 'jobMatch';
+export const FEATURES = [
+  'cvAnalysis',
+  'jobMatch',
+  'coverLetter',
+  'interviewPrep',
+  'answerFeedback',
+] as const;
+export type Feature = (typeof FEATURES)[number];
+
+/** How each feature is named in "you've used all 5 free ___" messages. */
+const featureNames: Record<Feature, string> = {
+  cvAnalysis: 'CV analyses',
+  jobMatch: 'job matches',
+  coverLetter: 'cover letters',
+  interviewPrep: 'interview prep sets',
+  answerFeedback: 'answer reviews',
+};
 type Plan = 'free' | 'pro';
 
 export function currentPeriod(date = new Date()): string {
@@ -16,6 +32,9 @@ export function limitFor(feature: Feature, plan: Plan): number | null {
   const limits: Record<Feature, number> = {
     cvAnalysis: env.FREE_CV_ANALYSES_PER_MONTH,
     jobMatch: env.FREE_JOB_MATCHES_PER_MONTH,
+    coverLetter: env.FREE_COVER_LETTERS_PER_MONTH,
+    interviewPrep: env.FREE_INTERVIEW_PREPS_PER_MONTH,
+    answerFeedback: env.FREE_ANSWER_FEEDBACK_PER_MONTH,
   };
   return limits[feature];
 }
@@ -54,10 +73,9 @@ export async function reserveUse(userId: string, plan: Plan, feature: Feature): 
     );
   } catch (err) {
     if ((err as { code?: number }).code === 11000) {
-      const what = feature === 'cvAnalysis' ? 'CV analyses' : 'job matches';
       throw new AppError(
         403,
-        `You've used all ${limit} free ${what} for this month. They reset on the 1st.`,
+        `You've used all ${limit} free ${featureNames[feature]} for this month. They reset on the 1st.`,
         'PLAN_LIMIT_REACHED',
       );
     }
@@ -90,5 +108,12 @@ export async function getUsageSummary(userId: string, plan: Plan) {
     return { used, limit, remaining: limit === null ? null : Math.max(limit - used, 0) };
   };
 
-  return { period, plan, cvAnalysis: summarise('cvAnalysis'), jobMatch: summarise('jobMatch') };
+  return {
+    period,
+    plan,
+    ...(Object.fromEntries(FEATURES.map((f) => [f, summarise(f)])) as Record<
+      Feature,
+      ReturnType<typeof summarise>
+    >),
+  };
 }

@@ -36,6 +36,9 @@ export type Usage = {
   plan: 'free' | 'pro';
   cvAnalysis: UsageCounter;
   jobMatch: UsageCounter;
+  coverLetter: UsageCounter;
+  interviewPrep: UsageCounter;
+  answerFeedback: UsageCounter;
 };
 
 export type UsageCounter = { used: number; limit: number | null; remaining: number | null };

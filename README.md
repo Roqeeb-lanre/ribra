@@ -2,17 +2,20 @@
 
 **Your AI co-pilot for landing the job, from CV to offer.**
 
-Ribra scores your CV like an Applicant Tracking System (ATS), matches it against real job descriptions, and tells you exactly what to fix. Cover letters, interview prep and an application tracker are next.
+Ribra scores your CV like an Applicant Tracking System (ATS), matches it against real job descriptions, tells you exactly what to fix, writes tailored cover letters, coaches you for interviews and tracks every application on one board.
 
 **Live:** https://ribra.vercel.app
 
-> Status: accounts (email, Google), AI CV analyzer and CV-vs-job matching are live.
+> Status: all core features are live: accounts (email, Google), AI CV analyzer, CV-vs-job matching, application tracker, cover letters and interview prep.
 
 ## Features
 
 - **Accounts**: sign up with email or Google, email confirmation, forgot/reset password, secure sessions that survive refreshes.
 - **AI CV Analyzer**: upload a PDF, Word or text CV and get an overall score, five sub-scores (ATS readiness, impact, skills, structure, clarity), prioritised fixes, rewritten bullet points and a skills breakdown. Every report is saved.
 - **Job Match**: paste a job description to get a match score, required/nice-to-have keywords found or missing in your CV, fit strengths and gaps, tailoring tips per CV section and a suggested summary.
+- **Application tracker**: a drag-and-drop board (Saved, Applied, Interview, Offer, Rejected) with notes, links, salary, next steps with due dates, a status timeline, and one-click "Track this job" from any job match.
+- **Cover letters**: a tailored letter for any job match in three tones and two lengths, written only from real CV experience, signed with your name in code (never sent to the AI), and editable, copyable and downloadable.
+- **Interview prep**: about 8 likely questions per job (motivation, behavioural, technical, role), including the candidate's gaps, with why they're asked, how to answer and which CV experience to use. Practise each answer and get a 1-10 score, strengths, improvements and a stronger version.
 - **Fair usage**: free monthly limits per feature, counted atomically and refunded if the AI call fails.
 
 ## Tech stack
@@ -84,28 +87,38 @@ Without `BREVO_API_KEY`, emails (confirmation, password reset) are printed in th
 
 All routes are under `/api/v1` and return JSON. Errors look like `{ "error": { "code", "message", "details?" } }`.
 
-| Method | Route                              | Auth   | Description                                                     |
-| ------ | ---------------------------------- | ------ | --------------------------------------------------------------- |
-| GET    | `/health`                          | -      | API, database and AI status                                     |
-| POST   | `/auth/register`                   | -      | Create an account and send a confirmation email                 |
-| POST   | `/auth/login`                      | -      | Log in; returns an access token and sets the refresh cookie     |
-| POST   | `/auth/google`                     | -      | Sign in or sign up with a Google ID token                       |
-| POST   | `/auth/refresh`                    | cookie | Rotate the refresh cookie and get a new access token            |
-| POST   | `/auth/logout`                     | cookie | End the current session                                         |
-| GET    | `/auth/me`                         | Bearer | The logged-in user                                              |
-| POST   | `/auth/verify-email`               | -      | Confirm an email address with the emailed token                 |
-| POST   | `/auth/resend-verification`        | Bearer | Send a new confirmation email                                   |
-| POST   | `/auth/forgot-password`            | -      | Email a reset link (same reply whether or not the email exists) |
-| POST   | `/auth/reset-password`             | -      | Set a new password with the emailed token; ends all sessions    |
-| GET    | `/resumes`                         | Bearer | The user's CVs with their latest score                          |
-| POST   | `/resumes`                         | Bearer | Upload a CV (PDF, DOCX or TXT, max 5 MB)                        |
-| DELETE | `/resumes/:id`                     | Bearer | Delete a CV with its reports and job matches                    |
-| POST   | `/resumes/:id/analyze`             | Bearer | Run the AI CV analysis                                          |
-| GET    | `/analyses`, `/analyses/:id`       | Bearer | Past CV reports                                                 |
-| POST   | `/job-matches`                     | Bearer | Compare a saved CV with a pasted job description                |
-| GET    | `/job-matches`, `/job-matches/:id` | Bearer | Past job matches                                                |
-| DELETE | `/job-matches/:id`                 | Bearer | Delete a job match                                              |
-| GET    | `/usage`                           | Bearer | AI uses left this month                                         |
+| Method             | Route                                          | Auth   | Description                                                     |
+| ------------------ | ---------------------------------------------- | ------ | --------------------------------------------------------------- |
+| GET                | `/health`                                      | -      | API, database and AI status                                     |
+| POST               | `/auth/register`                               | -      | Create an account and send a confirmation email                 |
+| POST               | `/auth/login`                                  | -      | Log in; returns an access token and sets the refresh cookie     |
+| POST               | `/auth/google`                                 | -      | Sign in or sign up with a Google ID token                       |
+| POST               | `/auth/refresh`                                | cookie | Rotate the refresh cookie and get a new access token            |
+| POST               | `/auth/logout`                                 | cookie | End the current session                                         |
+| GET                | `/auth/me`                                     | Bearer | The logged-in user                                              |
+| POST               | `/auth/verify-email`                           | -      | Confirm an email address with the emailed token                 |
+| POST               | `/auth/resend-verification`                    | Bearer | Send a new confirmation email                                   |
+| POST               | `/auth/forgot-password`                        | -      | Email a reset link (same reply whether or not the email exists) |
+| POST               | `/auth/reset-password`                         | -      | Set a new password with the emailed token; ends all sessions    |
+| GET                | `/resumes`                                     | Bearer | The user's CVs with their latest score                          |
+| POST               | `/resumes`                                     | Bearer | Upload a CV (PDF, DOCX or TXT, max 5 MB)                        |
+| DELETE             | `/resumes/:id`                                 | Bearer | Delete a CV with its reports and job matches                    |
+| POST               | `/resumes/:id/analyze`                         | Bearer | Run the AI CV analysis                                          |
+| GET                | `/analyses`, `/analyses/:id`                   | Bearer | Past CV reports                                                 |
+| POST               | `/job-matches`                                 | Bearer | Compare a saved CV with a pasted job description                |
+| GET                | `/job-matches`, `/job-matches/:id`             | Bearer | Past job matches                                                |
+| DELETE             | `/job-matches/:id`                             | Bearer | Delete a job match with its cover letter and interview prep     |
+| GET                | `/usage`                                       | Bearer | AI uses left this month                                         |
+| GET, POST          | `/applications`                                | Bearer | List tracked jobs / add one                                     |
+| POST               | `/applications/from-match/:matchId`            | Bearer | Track a job match (only once per match)                         |
+| GET, PATCH, DELETE | `/applications/:id`                            | Bearer | Read, update (status changes are recorded) or delete            |
+| GET, POST          | `/cover-letters`                               | Bearer | List letters / write or rewrite one for a job match             |
+| GET                | `/cover-letters/by-match/:matchId`             | Bearer | The letter for a job match                                      |
+| PATCH, DELETE      | `/cover-letters/:id`                           | Bearer | Save edits / delete                                             |
+| GET, POST          | `/interview-preps`                             | Bearer | List prep sets / generate questions for a job match             |
+| GET                | `/interview-preps/by-match/:matchId`           | Bearer | Questions and feedback for a job match                          |
+| POST               | `/interview-preps/:id/questions/:qid/feedback` | Bearer | AI review of a practice answer                                  |
+| DELETE             | `/interview-preps/:id`                         | Bearer | Delete a prep set                                               |
 
 ## How it works
 
@@ -133,14 +146,21 @@ All routes are under `/api/v1` and return JSON. Errors look like `{ "error": { "
 - **Match score = 60% AI fit + 40% keyword coverage** (required keywords count double).
 - The same CV + job description is cached by hash, so re-checking it is instant and free.
 
+### Cover letters and interview prep
+
+- Both are built from a job match, so the AI sees the job description, the (redacted) CV and, for interview prep, the gaps found in the match.
+- The cover letter comes back as parts (greeting, paragraphs, closing); Ribra assembles it and adds the user's name itself.
+- Practice answers are reviewed one at a time, with their own monthly allowance, and the score is clamped to 1-10.
+- Deleting a job match or CV deletes its letter and prep; tracked applications are kept and just lose the link.
+
 ## Roadmap
 
 - [x] Stage 0: Foundation (monorepo, CI, deploys)
 - [x] Stage 1: Accounts (email + password, Google, email confirmation, password reset)
 - [x] Stage 3: AI CV analyzer
 - [x] Stage 4: CV vs job match
-- [ ] Stage 5: Application tracker
-- [ ] Stage 6: Cover letters and interview prep
+- [x] Stage 5: Application tracker
+- [x] Stage 6: Cover letters and interview prep
 - [ ] Stage 7: Plans and payments (Paystack)
 - [ ] Stage 8: Reminders and analytics
 - [ ] Stage 9: Admin and polish
