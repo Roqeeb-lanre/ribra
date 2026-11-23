@@ -70,16 +70,22 @@ export function AppLayout() {
                 Upgrade
               </Link>
             )}
-            <div className="hidden text-right md:block">
-              <p className="text-sm font-medium text-white">{user.name}</p>
-              <p className="text-xs text-slate-400">{user.email}</p>
-            </div>
-            <div
-              aria-hidden
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-500/20 text-sm font-semibold text-brand-200"
+            <Link
+              to="/settings"
+              title="Account settings"
+              className="flex items-center gap-3 rounded-lg px-1.5 py-1 hover:bg-white/5"
             >
-              {user.name.charAt(0).toUpperCase()}
-            </div>
+              <div className="hidden text-right md:block">
+                <p className="text-sm font-medium text-white">{user.name}</p>
+                <p className="text-xs text-slate-400">{user.email}</p>
+              </div>
+              <div
+                aria-hidden
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-500/20 text-sm font-semibold text-brand-200"
+              >
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            </Link>
             <Button variant="secondary" onClick={handleLogout} loading={loggingOut}>
               Log out
             </Button>

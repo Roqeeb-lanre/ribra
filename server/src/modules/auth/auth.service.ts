@@ -27,7 +27,7 @@ import {
 } from './tokens.js';
 
 // Fewer hashing rounds in tests keeps the test suite fast; 12 is the secure default.
-const BCRYPT_ROUNDS = env.isTest ? 4 : 12;
+export const BCRYPT_ROUNDS = env.isTest ? 4 : 12;
 
 // Used to spend the same time on unknown emails as on real ones (stops "does this email exist?" probing).
 const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', BCRYPT_ROUNDS);

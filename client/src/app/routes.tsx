@@ -51,6 +51,7 @@ export const router = createBrowserRouter([
           },
           { path: '/prep', lazy: page(() => import('@/pages/PrepPage')) },
           { path: '/billing', lazy: page(() => import('@/pages/BillingPage')) },
+          { path: '/settings', lazy: page(() => import('@/pages/SettingsPage')) },
           {
             path: '/billing/callback',
             lazy: page(() => import('@/pages/BillingCallbackPage')),

@@ -73,3 +73,22 @@ export function resetPasswordMessage(
     text: `Reset your Ribra password by opening this link:\n${url}\n\nThis link expires in 30 minutes and can be used once. If you didn't ask for this, ignore this email.`,
   };
 }
+
+export function passwordChangedMessage(
+  user: { name: string; email: string },
+  resetUrl: string,
+): EmailMessage {
+  return {
+    to: { email: user.email, name: user.name },
+    subject: 'Your Ribra password was changed',
+    html: layout({
+      heading: 'Your password was changed',
+      intro:
+        'The password for your Ribra account was just changed, and you were logged out on your other devices. If this was you, there is nothing else to do.',
+      buttonText: "This wasn't me: reset my password",
+      url: resetUrl,
+      footer: 'For your security, we send this email every time your password changes.',
+    }),
+    text: `The password for your Ribra account was just changed, and you were logged out on your other devices.\n\nIf this wasn't you, reset your password now:\n${resetUrl}`,
+  };
+}

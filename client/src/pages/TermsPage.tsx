@@ -49,18 +49,25 @@ export default function TermsPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="Free plan and changes">
+      <LegalSection title="Plans and payments">
         <p>
-          Ribra is currently free, with monthly limits on AI features. We may change features or
-          limits, or pause or stop the service, at any time. If we plan to shut Ribra down, we will
-          try to give you notice so you can save what you need.
+          Ribra has a free plan and a paid Pro plan, each with monthly limits on AI features. Pro is
+          billed monthly through Paystack and renews automatically until you cancel. You can cancel
+          anytime on your Plan page: you keep Pro until the end of the month you paid for, and you
+          won&apos;t be charged again. Payments already made are not refunded, except where the law
+          requires it.
+        </p>
+        <p>
+          We may change features, limits or prices, or pause or stop the service. We will tell Pro
+          subscribers before a price change applies to them, and if we plan to shut Ribra down we
+          will try to give you notice so you can save what you need.
         </p>
       </LegalSection>
 
       <LegalSection title="Closing your account">
         <p>
-          You can stop using Ribra at any time and ask us to delete your account by emailing{' '}
-          <ContactLink />. We may suspend accounts that break these terms.
+          You can stop using Ribra at any time, and delete your account yourself in Settings. This
+          also cancels any Pro subscription. We may suspend accounts that break these terms.
         </p>
       </LegalSection>
 

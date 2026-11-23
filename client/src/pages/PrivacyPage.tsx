@@ -32,6 +32,11 @@ export default function PrivacyPage() {
               descriptions you paste in and the match reports we generate.
             </>,
             <>
+              <strong className="text-white">Payments:</strong> if you upgrade to Pro, Paystack
+              tells us the amount, date, payment reference and subscription status. Your card
+              details go straight to Paystack; Ribra never sees them.
+            </>,
+            <>
               <strong className="text-white">Usage and security data:</strong> how many AI features
               you used this month (for the free plan limits), login sessions, and basic technical
               logs such as IP address and browser type, used to keep the service secure.
@@ -74,6 +79,7 @@ export default function PrivacyPage() {
             'Vercel (hosts the Ribra website)',
             'Google (Gemini AI processing and, if you use it, Google sign-in)',
             'Brevo (sends account emails)',
+            'Paystack (processes Pro payments; Ribra never sees your card details)',
           ]}
         />
         <p>We may also disclose information if the law requires it.</p>
@@ -89,17 +95,25 @@ export default function PrivacyPage() {
       <LegalSection title="How long we keep it">
         <p>
           We keep your data while your account exists. You can delete any CV in the app at any time,
-          which also deletes its analyses and job matches. Email and password-reset links expire
-          automatically, and login sessions end after 7 days of inactivity.
+          which also deletes its analyses, job matches, cover letters and interview prep. Email and
+          password-reset links expire automatically, and login sessions end after 7 days of
+          inactivity.
+        </p>
+        <p>
+          When you delete your account, everything above is deleted straight away. We keep only
+          basic records of payments you made (amount, date and Paystack reference), because the law
+          requires businesses to keep financial records.
         </p>
       </LegalSection>
 
       <LegalSection title="Your choices">
         <p>
-          You can ask to see, correct, export or delete your data, or to close your account, by
-          emailing <ContactLink />. We will reply within 30 days. Depending on where you live (for
-          example under Nigeria’s NDPA or the EU/UK GDPR), you may have further rights, including
-          the right to complain to your data protection authority.
+          In <strong className="text-white">Settings</strong> you can update your name and password,
+          see and log out your devices, download all your data as a file, and delete your account.
+          For anything else, such as correcting your email address, email <ContactLink />. We will
+          reply within 30 days. Depending on where you live (for example under Nigeria&apos;s NDPA
+          or the EU/UK GDPR), you may have further rights, including the right to complain to your
+          data protection authority.
         </p>
       </LegalSection>
 

@@ -62,3 +62,11 @@ export const emailLimiter = rateLimit({
   limit: 5,
   keyGenerator: (req) => `${user(req)}:${String(req.body?.email ?? '').toLowerCase()}`,
 });
+
+/** Password changes and account deletion: 10 tries per 15 minutes per user (stops password guessing). */
+export const sensitiveLimiter = rateLimit({
+  ...common,
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  keyGenerator: user,
+});

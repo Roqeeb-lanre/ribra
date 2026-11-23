@@ -16,6 +16,8 @@ Ribra scores your CV like an Applicant Tracking System (ATS), matches it against
 - **Application tracker**: a drag-and-drop board (Saved, Applied, Interview, Offer, Rejected) with notes, links, salary, next steps with due dates, a status timeline, and one-click "Track this job" from any job match.
 - **Cover letters**: a tailored letter for any job match in three tones and two lengths, written only from real CV experience, signed with your name in code (never sent to the AI), and editable, copyable and downloadable.
 - **Interview prep**: about 8 likely questions per job (motivation, behavioural, technical, role), including the candidate's gaps, with why they're asked, how to answer and which CV experience to use. Practise each answer and get a 1-10 score, strengths, improvements and a stronger version.
+- **Ribra Pro**: ₦5,000/month subscription through Paystack (checkout, signed webhooks, renewals, cancel at period end, change card), with higher monthly limits.
+- **Account settings**: change name and password (logs out other devices and emails a security notice), see and log out devices, download all your data as JSON, and delete your account (cancels any subscription first).
 - **Fair usage**: free monthly limits per feature, counted atomically and refunded if the AI call fails.
 
 ## Tech stack
@@ -87,38 +89,48 @@ Without `BREVO_API_KEY`, emails (confirmation, password reset) are printed in th
 
 All routes are under `/api/v1` and return JSON. Errors look like `{ "error": { "code", "message", "details?" } }`.
 
-| Method             | Route                                          | Auth   | Description                                                     |
-| ------------------ | ---------------------------------------------- | ------ | --------------------------------------------------------------- |
-| GET                | `/health`                                      | -      | API, database and AI status                                     |
-| POST               | `/auth/register`                               | -      | Create an account and send a confirmation email                 |
-| POST               | `/auth/login`                                  | -      | Log in; returns an access token and sets the refresh cookie     |
-| POST               | `/auth/google`                                 | -      | Sign in or sign up with a Google ID token                       |
-| POST               | `/auth/refresh`                                | cookie | Rotate the refresh cookie and get a new access token            |
-| POST               | `/auth/logout`                                 | cookie | End the current session                                         |
-| GET                | `/auth/me`                                     | Bearer | The logged-in user                                              |
-| POST               | `/auth/verify-email`                           | -      | Confirm an email address with the emailed token                 |
-| POST               | `/auth/resend-verification`                    | Bearer | Send a new confirmation email                                   |
-| POST               | `/auth/forgot-password`                        | -      | Email a reset link (same reply whether or not the email exists) |
-| POST               | `/auth/reset-password`                         | -      | Set a new password with the emailed token; ends all sessions    |
-| GET                | `/resumes`                                     | Bearer | The user's CVs with their latest score                          |
-| POST               | `/resumes`                                     | Bearer | Upload a CV (PDF, DOCX or TXT, max 5 MB)                        |
-| DELETE             | `/resumes/:id`                                 | Bearer | Delete a CV with its reports and job matches                    |
-| POST               | `/resumes/:id/analyze`                         | Bearer | Run the AI CV analysis                                          |
-| GET                | `/analyses`, `/analyses/:id`                   | Bearer | Past CV reports                                                 |
-| POST               | `/job-matches`                                 | Bearer | Compare a saved CV with a pasted job description                |
-| GET                | `/job-matches`, `/job-matches/:id`             | Bearer | Past job matches                                                |
-| DELETE             | `/job-matches/:id`                             | Bearer | Delete a job match with its cover letter and interview prep     |
-| GET                | `/usage`                                       | Bearer | AI uses left this month                                         |
-| GET, POST          | `/applications`                                | Bearer | List tracked jobs / add one                                     |
-| POST               | `/applications/from-match/:matchId`            | Bearer | Track a job match (only once per match)                         |
-| GET, PATCH, DELETE | `/applications/:id`                            | Bearer | Read, update (status changes are recorded) or delete            |
-| GET, POST          | `/cover-letters`                               | Bearer | List letters / write or rewrite one for a job match             |
-| GET                | `/cover-letters/by-match/:matchId`             | Bearer | The letter for a job match                                      |
-| PATCH, DELETE      | `/cover-letters/:id`                           | Bearer | Save edits / delete                                             |
-| GET, POST          | `/interview-preps`                             | Bearer | List prep sets / generate questions for a job match             |
-| GET                | `/interview-preps/by-match/:matchId`           | Bearer | Questions and feedback for a job match                          |
-| POST               | `/interview-preps/:id/questions/:qid/feedback` | Bearer | AI review of a practice answer                                  |
-| DELETE             | `/interview-preps/:id`                         | Bearer | Delete a prep set                                               |
+| Method             | Route                                          | Auth            | Description                                                     |
+| ------------------ | ---------------------------------------------- | --------------- | --------------------------------------------------------------- |
+| GET                | `/health`                                      | -               | API, database and AI status                                     |
+| POST               | `/auth/register`                               | -               | Create an account and send a confirmation email                 |
+| POST               | `/auth/login`                                  | -               | Log in; returns an access token and sets the refresh cookie     |
+| POST               | `/auth/google`                                 | -               | Sign in or sign up with a Google ID token                       |
+| POST               | `/auth/refresh`                                | cookie          | Rotate the refresh cookie and get a new access token            |
+| POST               | `/auth/logout`                                 | cookie          | End the current session                                         |
+| GET                | `/auth/me`                                     | Bearer          | The logged-in user                                              |
+| POST               | `/auth/verify-email`                           | -               | Confirm an email address with the emailed token                 |
+| POST               | `/auth/resend-verification`                    | Bearer          | Send a new confirmation email                                   |
+| POST               | `/auth/forgot-password`                        | -               | Email a reset link (same reply whether or not the email exists) |
+| POST               | `/auth/reset-password`                         | -               | Set a new password with the emailed token; ends all sessions    |
+| GET                | `/resumes`                                     | Bearer          | The user's CVs with their latest score                          |
+| POST               | `/resumes`                                     | Bearer          | Upload a CV (PDF, DOCX or TXT, max 5 MB)                        |
+| DELETE             | `/resumes/:id`                                 | Bearer          | Delete a CV with its reports and job matches                    |
+| POST               | `/resumes/:id/analyze`                         | Bearer          | Run the AI CV analysis                                          |
+| GET                | `/analyses`, `/analyses/:id`                   | Bearer          | Past CV reports                                                 |
+| POST               | `/job-matches`                                 | Bearer          | Compare a saved CV with a pasted job description                |
+| GET                | `/job-matches`, `/job-matches/:id`             | Bearer          | Past job matches                                                |
+| DELETE             | `/job-matches/:id`                             | Bearer          | Delete a job match with its cover letter and interview prep     |
+| GET                | `/usage`                                       | Bearer          | AI uses left this month                                         |
+| PATCH, DELETE      | `/auth/me`                                     | Bearer          | Update your name / delete your account and data                 |
+| POST               | `/auth/password`                               | Bearer + cookie | Change or set your password; logs out other devices             |
+| GET                | `/auth/sessions`                               | Bearer + cookie | Devices you're logged in on                                     |
+| POST               | `/auth/sessions/sign-out-others`               | Bearer + cookie | Log out every other device                                      |
+| GET                | `/auth/me/export`                              | Bearer          | Download all your data as JSON                                  |
+| GET                | `/billing`                                     | Bearer          | Plan, subscription status and payments                          |
+| POST               | `/billing/checkout`                            | Bearer          | Start a Paystack checkout for Pro                               |
+| GET                | `/billing/verify/:reference`                   | Bearer          | Confirm a payment after the redirect                            |
+| POST               | `/billing/manage`, `/billing/cancel`           | Bearer          | Change card on Paystack / cancel renewal                        |
+| POST               | `/billing/paystack/webhook`                    | signature       | Paystack events (HMAC-SHA512 verified)                          |
+| GET, POST          | `/applications`                                | Bearer          | List tracked jobs / add one                                     |
+| POST               | `/applications/from-match/:matchId`            | Bearer          | Track a job match (only once per match)                         |
+| GET, PATCH, DELETE | `/applications/:id`                            | Bearer          | Read, update (status changes are recorded) or delete            |
+| GET, POST          | `/cover-letters`                               | Bearer          | List letters / write or rewrite one for a job match             |
+| GET                | `/cover-letters/by-match/:matchId`             | Bearer          | The letter for a job match                                      |
+| PATCH, DELETE      | `/cover-letters/:id`                           | Bearer          | Save edits / delete                                             |
+| GET, POST          | `/interview-preps`                             | Bearer          | List prep sets / generate questions for a job match             |
+| GET                | `/interview-preps/by-match/:matchId`           | Bearer          | Questions and feedback for a job match                          |
+| POST               | `/interview-preps/:id/questions/:qid/feedback` | Bearer          | AI review of a practice answer                                  |
+| DELETE             | `/interview-preps/:id`                         | Bearer          | Delete a prep set                                               |
 
 ## How it works
 
@@ -153,6 +165,13 @@ All routes are under `/api/v1` and return JSON. Errors look like `{ "error": { "
 - Practice answers are reviewed one at a time, with their own monthly allowance, and the score is clamped to 1-10.
 - Deleting a job match or CV deletes its letter and prep; tracked applications are kept and just lose the link.
 
+### Payments (Paystack)
+
+- Checkout uses a Paystack plan, so Paystack charges the card monthly. The user id travels in the transaction metadata.
+- Pro is granted by **either** the signed webhook or a server-side verify call after the redirect, whichever comes first. A unique payment reference makes both safe to repeat.
+- Webhooks are checked with HMAC-SHA512 over the raw request body before anything is read.
+- Pro lasts until the next billing date plus 3 days' grace; cancelling stops renewals but keeps Pro until the paid month ends.
+
 ## Roadmap
 
 - [x] Stage 0: Foundation (monorepo, CI, deploys)
@@ -161,7 +180,8 @@ All routes are under `/api/v1` and return JSON. Errors look like `{ "error": { "
 - [x] Stage 4: CV vs job match
 - [x] Stage 5: Application tracker
 - [x] Stage 6: Cover letters and interview prep
-- [ ] Stage 7: Plans and payments (Paystack)
+- [x] Stage 7: Plans and payments (Paystack)
+- [x] Account settings (profile, password, devices, data export, account deletion)
 - [ ] Stage 8: Reminders and analytics
 - [ ] Stage 9: Admin and polish
 - [ ] Stage 10: Launch

@@ -1,8 +1,19 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middleware/auth.js';
-import { emailLimiter, loginLimiter, registerLimiter } from '../../middleware/rateLimit.js';
+import {
+  emailLimiter,
+  loginLimiter,
+  registerLimiter,
+  sensitiveLimiter,
+} from '../../middleware/rateLimit.js';
 import { validateBody } from '../../middleware/validate.js';
 import * as controller from './auth.controller.js';
+import * as account from '../account/account.routes.js';
+import {
+  changePasswordSchema,
+  deleteAccountSchema,
+  updateProfileSchema,
+} from '../account/account.schema.js';
 import {
   emailOnlySchema,
   googleSchema,
@@ -35,3 +46,23 @@ authRouter.post('/reset-password', validateBody(resetPasswordSchema), controller
 
 // Google sign-in
 authRouter.post('/google', loginLimiter, validateBody(googleSchema), controller.google);
+
+// Account settings
+authRouter.patch('/me', requireAuth, validateBody(updateProfileSchema), account.updateProfile);
+authRouter.post(
+  '/password',
+  requireAuth,
+  sensitiveLimiter,
+  validateBody(changePasswordSchema),
+  account.changePassword,
+);
+authRouter.get('/sessions', requireAuth, account.listSessions);
+authRouter.post('/sessions/sign-out-others', requireAuth, account.signOutOthers);
+authRouter.get('/me/export', requireAuth, account.exportData);
+authRouter.delete(
+  '/me',
+  requireAuth,
+  sensitiveLimiter,
+  validateBody(deleteAccountSchema),
+  account.deleteAccount,
+);
