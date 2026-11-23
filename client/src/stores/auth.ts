@@ -12,6 +12,7 @@ export type User = {
   proUntil: string | null;
   hasPassword: boolean;
   googleLinked: boolean;
+  emailReminders: boolean;
   createdAt: string;
 };
 

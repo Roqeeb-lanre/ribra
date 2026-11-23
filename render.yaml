@@ -32,5 +32,7 @@ services:
         sync: false
       - key: PAYSTACK_PLAN_CODE
         sync: false
+      - key: CRON_SECRET
+        sync: false
       - key: APP_URL
         value: https://ribra.vercel.app

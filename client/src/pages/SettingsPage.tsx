@@ -40,6 +40,7 @@ export default function SettingsPage() {
 
       <div className="mt-8 space-y-6">
         <ProfileSection />
+        <NotificationsSection />
         <PasswordSection />
         <SessionsSection />
         <DataSection />
@@ -102,7 +103,7 @@ function ProfileSection() {
   const onSubmit = handleSubmit(async ({ name }) => {
     setFormError(null);
     try {
-      const { user: saved } = await update.mutateAsync(name);
+      const { user: saved } = await update.mutateAsync({ name });
       reset({ name: saved.name });
     } catch (err) {
       setFormError(applyServerErrors(err, setError));
@@ -151,6 +152,52 @@ function ProfileSection() {
           <Saved show={update.isSuccess && !isDirty} />
         </div>
       </form>
+    </Section>
+  );
+}
+
+// ---- Notifications ----
+
+function NotificationsSection() {
+  const user = useAuthStore((s) => s.user)!;
+  const update = useUpdateProfile();
+  const on = update.isPending ? !user.emailReminders : user.emailReminders;
+
+  return (
+    <Section title="Email reminders">
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <p className="text-sm text-white">Next-step reminders</p>
+          <p className="mt-1 text-sm text-slate-400">
+            One email in the morning when a next step in your tracker is due today or tomorrow.
+            {!user.emailVerified && ' Confirm your email address to receive them.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={on}
+          aria-label="Next-step reminder emails"
+          disabled={update.isPending}
+          onClick={() => update.mutate({ emailReminders: !user.emailReminders })}
+          className={cn(
+            'relative mt-1 h-6 w-11 shrink-0 rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 disabled:opacity-60',
+            on ? 'bg-brand-500' : 'bg-white/15',
+          )}
+        >
+          <span
+            className={cn(
+              'absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition',
+              on && 'translate-x-5',
+            )}
+          />
+        </button>
+      </div>
+      {update.isError && (
+        <div className="mt-3">
+          <Alert>{errorText(update.error, 'We could not save that. Please try again.')}</Alert>
+        </div>
+      )}
     </Section>
   );
 }

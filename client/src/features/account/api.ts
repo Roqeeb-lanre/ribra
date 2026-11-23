@@ -14,8 +14,8 @@ const sessionsKey = ['sessions'] as const;
 
 export function useUpdateProfile() {
   return useMutation({
-    mutationFn: (name: string) =>
-      apiRequest<{ user: User }>('/auth/me', { method: 'PATCH', body: { name } }),
+    mutationFn: (changes: { name?: string; emailReminders?: boolean }) =>
+      apiRequest<{ user: User }>('/auth/me', { method: 'PATCH', body: changes }),
     onSuccess: ({ user }) => useAuthStore.getState().setUser(user),
   });
 }

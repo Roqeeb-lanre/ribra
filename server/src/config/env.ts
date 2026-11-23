@@ -52,6 +52,11 @@ const envSchema = z.object({
   PAYSTACK_PLAN_CODE: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
   PRO_PRICE_NGN: z.coerce.number().int().positive().default(5000),
 
+  // Daily reminder emails. A scheduled GitHub Action calls the reminders endpoint with this secret.
+  CRON_SECRET: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(24).optional()),
+  // Which calendar "today" and "tomorrow" mean for reminders.
+  REMINDER_TIMEZONE: z.string().default('Africa/Lagos'),
+
   // Plan limits
   FREE_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
   FREE_JOB_MATCHES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),

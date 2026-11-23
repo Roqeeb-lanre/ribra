@@ -50,7 +50,8 @@ export async function currentSessionId(
 
 export async function updateProfile(userId: string, input: UpdateProfileInput) {
   const user = await loadUser(userId);
-  user.name = input.name;
+  if (input.name !== undefined) user.name = input.name;
+  if (input.emailReminders !== undefined) user.emailReminders = input.emailReminders;
   await user.save();
   return toPublicUser(user);
 }

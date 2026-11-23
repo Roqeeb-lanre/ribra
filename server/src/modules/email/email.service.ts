@@ -6,6 +6,8 @@ export type EmailMessage = {
   subject: string;
   html: string;
   text: string;
+  /** Extra email headers, e.g. List-Unsubscribe for reminder emails. */
+  headers?: Record<string, string>;
 };
 
 /** Emails "sent" while no provider is configured (tests and local development read these). */
@@ -43,6 +45,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
       subject: message.subject,
       htmlContent: message.html,
       textContent: message.text,
+      ...(message.headers ? { headers: message.headers } : {}),
     }),
     signal: AbortSignal.timeout(15_000),
   });

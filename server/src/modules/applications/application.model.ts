@@ -21,6 +21,8 @@ const applicationSchema = new Schema(
     // The next thing to do and when, e.g. "Technical interview" on 2 Dec.
     nextStep: { type: String, default: '' },
     nextStepAt: { type: Date, default: null },
+    // The next-step date we already sent a reminder for, so each step is reminded once.
+    reminderSentFor: { type: Date, default: null },
 
     // Set when the job was added from a Job Match report.
     jobMatchId: { type: Schema.Types.ObjectId, ref: 'JobMatch', default: null },
@@ -36,6 +38,7 @@ const applicationSchema = new Schema(
 );
 
 applicationSchema.index({ userId: 1, updatedAt: -1 });
+applicationSchema.index({ nextStepAt: 1, status: 1 });
 // A job match can be tracked only once per user.
 applicationSchema.index(
   { userId: 1, jobMatchId: 1 },

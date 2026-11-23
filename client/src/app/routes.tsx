@@ -27,6 +27,7 @@ export const router = createBrowserRouter([
   // Opened from email links: work whether or not someone is logged in.
   { path: '/verify-email', lazy: page(() => import('@/pages/VerifyEmailPage')) },
   { path: '/reset-password', lazy: page(() => import('@/pages/ResetPasswordPage')) },
+  { path: '/unsubscribe', lazy: page(() => import('@/pages/UnsubscribePage')) },
   // Public legal pages (linked from Google's sign-in screen).
   { path: '/privacy', lazy: page(() => import('@/pages/PrivacyPage')) },
   { path: '/terms', lazy: page(() => import('@/pages/TermsPage')) },

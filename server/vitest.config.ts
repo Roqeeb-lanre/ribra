@@ -16,6 +16,7 @@ export default defineConfig({
       PAYSTACK_SECRET_KEY: 'sk_test_ribra_tests',
       PAYSTACK_PLAN_CODE: 'PLN_test',
       PRO_PRICE_NGN: '5000',
+      CRON_SECRET: 'test-cron-secret-that-is-long-enough',
     },
     // The first run downloads a MongoDB binary for the in-memory test database.
     hookTimeout: 120_000,

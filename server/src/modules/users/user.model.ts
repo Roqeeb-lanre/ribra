@@ -23,6 +23,8 @@ const userSchema = new Schema(
       status: { type: String },
       nextPaymentAt: { type: Date },
     },
+    // Daily email about tracker next steps due today or tomorrow. Users can switch it off.
+    emailReminders: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
   },
   { timestamps: true },
@@ -56,6 +58,7 @@ export function toPublicUser(user: UserDocument) {
     proUntil: currentPlan(user) === 'pro' ? user.proUntil : null,
     hasPassword: Boolean(user.passwordHash),
     googleLinked: Boolean(user.googleId),
+    emailReminders: user.emailReminders !== false,
     createdAt: user.createdAt,
   };
 }

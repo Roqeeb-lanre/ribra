@@ -14,6 +14,7 @@ import { applicationsRouter } from './modules/applications/applications.routes.j
 import { coverLettersRouter } from './modules/coverLetters/coverLetters.routes.js';
 import { interviewPrepsRouter } from './modules/interviewPreps/interviewPreps.routes.js';
 import { billingRouter } from './modules/billing/billing.routes.js';
+import { internalRouter, remindersRouter } from './modules/reminders/reminders.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 /**
@@ -53,6 +54,8 @@ export function createApp() {
   app.use('/api/v1/cover-letters', coverLettersRouter);
   app.use('/api/v1/interview-preps', interviewPrepsRouter);
   app.use('/api/v1/billing', billingRouter);
+  app.use('/api/v1/reminders', remindersRouter);
+  app.use('/api/v1/internal', internalRouter);
   app.use('/api/v1/usage', usageRouter);
 
   // Errors
