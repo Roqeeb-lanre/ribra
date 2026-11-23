@@ -1,12 +1,54 @@
+<div align="center">
+
 # Ribra
 
 **Your AI co-pilot for landing the job, from CV to offer.**
 
-Ribra scores your CV like an Applicant Tracking System (ATS), matches it against real job descriptions, tells you exactly what to fix, writes tailored cover letters, coaches you for interviews and tracks every application on one board.
+[**Try it live →**](https://ribra.vercel.app)
 
-**Live:** https://ribra.vercel.app
+[![CI](https://github.com/Roqeeb-lanre/ribra/actions/workflows/ci.yml/badge.svg)](https://github.com/Roqeeb-lanre/ribra/actions/workflows/ci.yml)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React_19-20232A?logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js_22-339933?logo=nodedotjs&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?logo=googlegemini&logoColor=white)
+![Paystack](https://img.shields.io/badge/Paystack-00C3F7?logo=paystack&logoColor=white)
 
-> Status: all core features are live: accounts (email, Google), AI CV analyzer, CV-vs-job matching, application tracker, cover letters and interview prep.
+<img src="docs/screenshots/landing.png" alt="Ribra landing page" width="900" />
+
+</div>
+
+Ribra scores your CV like an Applicant Tracking System (ATS), matches it against real job descriptions, tells you exactly what to fix, writes tailored cover letters, coaches you for interviews and tracks every application on one board. It is a full-stack TypeScript SaaS with real payments, built and deployed end to end.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/cv-report.png" alt="AI CV analysis report" /><p align="center"><b>AI CV analysis</b>: ATS-style score, sub-scores and prioritised fixes</p></td>
+    <td width="50%"><img src="docs/screenshots/job-match.png" alt="Job match report" /><p align="center"><b>Job match</b>: keywords found or missing, checked in code</p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/tracker.png" alt="Application tracker board" /><p align="center"><b>Application tracker</b>: drag-and-drop board with next steps</p></td>
+    <td><img src="docs/screenshots/interview-prep.png" alt="Interview prep with AI feedback" /><p align="center"><b>Interview prep</b>: practise answers and get scored feedback</p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/cover-letter.png" alt="Cover letter editor" /><p align="center"><b>Cover letters</b>: tailored, editable, downloadable</p></td>
+    <td><img src="docs/screenshots/plan.png" alt="Plan and billing page" /><p align="center"><b>Ribra Pro</b>: Paystack subscription and usage limits</p></td>
+  </tr>
+</table>
+
+<sub>Screenshots use a made-up demo account.</sub>
+
+## Highlights
+
+- **Production-style auth**: 15-minute access tokens in memory, rotating refresh tokens in an httpOnly cookie with reuse detection, Google sign-in, email verification and password reset.
+- **Reliable AI**: one provider-agnostic client with JSON-schema output, Zod validation, automatic JSON repair and model fallback; contact details are redacted before anything reaches the AI.
+- **AI plus deterministic code**: the AI extracts job keywords, but Ribra's own code decides which ones your CV contains, so match scores are explainable and repeatable.
+- **Real payments**: Paystack subscriptions with HMAC-verified webhooks, idempotent payment records and cancel-at-period-end.
+- **Fair usage**: per-feature monthly limits reserved atomically in MongoDB and refunded if the AI call fails.
+- **Automation**: daily reminder emails triggered by a scheduled GitHub Action, with one-click unsubscribe.
+- **Privacy built in**: users can export all their data as JSON or delete their account, which also cancels their subscription.
+- **Quality**: TypeScript end to end, ESLint and Prettier, 130+ automated tests (many against an in-memory MongoDB), and CI on every push.
 
 ## Features
 
@@ -17,6 +59,7 @@ Ribra scores your CV like an Applicant Tracking System (ATS), matches it against
 - **Cover letters**: a tailored letter for any job match in three tones and two lengths, written only from real CV experience, signed with your name in code (never sent to the AI), and editable, copyable and downloadable.
 - **Interview prep**: about 8 likely questions per job (motivation, behavioural, technical, role), including the candidate's gaps, with why they're asked, how to answer and which CV experience to use. Practise each answer and get a 1-10 score, strengths, improvements and a stronger version.
 - **Ribra Pro**: ₦5,000/month subscription through Paystack (checkout, signed webhooks, renewals, cancel at period end, change card), with higher monthly limits.
+- **Email reminders**: one email each morning listing tracker next steps due today or tomorrow, sent once per step, with an on/off switch and one-click unsubscribe.
 - **Account settings**: change name and password (logs out other devices and emails a security notice), see and log out devices, download all your data as JSON, and delete your account (cancels any subscription first).
 - **Fair usage**: free monthly limits per feature, counted atomically and refunded if the AI call fails.
 
@@ -182,6 +225,7 @@ All routes are under `/api/v1` and return JSON. Errors look like `{ "error": { "
 - [x] Stage 6: Cover letters and interview prep
 - [x] Stage 7: Plans and payments (Paystack)
 - [x] Account settings (profile, password, devices, data export, account deletion)
-- [ ] Stage 8: Reminders and analytics
+- [x] Stage 8: Daily email reminders
+- [ ] Job search analytics (response rates, time to interview)
 - [ ] Stage 9: Admin and polish
 - [ ] Stage 10: Launch
