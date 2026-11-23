@@ -8,6 +8,8 @@ export type User = {
   emailVerified: boolean;
   avatarUrl: string | null;
   plan: 'free' | 'pro';
+  /** When Pro ends (or renews), for Pro users. */
+  proUntil: string | null;
   hasPassword: boolean;
   googleLinked: boolean;
   createdAt: string;

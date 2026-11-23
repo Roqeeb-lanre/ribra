@@ -45,6 +45,13 @@ const envSchema = z.object({
   // "Sign in with Google" (OAuth client ID from Google Cloud). Optional: the button is hidden without it.
   GOOGLE_CLIENT_ID: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
 
+  // Payments with Paystack (https://dashboard.paystack.com/#/settings/developers).
+  // Without these, the "Upgrade" button explains that payments aren't set up yet.
+  PAYSTACK_SECRET_KEY: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
+  // The monthly plan's code (PLN_...). Create it with: npm run paystack:plan -w server
+  PAYSTACK_PLAN_CODE: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
+  PRO_PRICE_NGN: z.coerce.number().int().positive().default(5000),
+
   // Plan limits
   FREE_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
   FREE_JOB_MATCHES_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
@@ -52,6 +59,12 @@ const envSchema = z.object({
   FREE_INTERVIEW_PREPS_PER_MONTH: z.coerce.number().int().nonnegative().default(5),
   // Feedback on one practice answer is a small AI call, so the free plan gets more of them.
   FREE_ANSWER_FEEDBACK_PER_MONTH: z.coerce.number().int().nonnegative().default(30),
+  // Pro is generous but not unlimited, so one user can't use up the shared AI quota.
+  PRO_CV_ANALYSES_PER_MONTH: z.coerce.number().int().nonnegative().default(50),
+  PRO_JOB_MATCHES_PER_MONTH: z.coerce.number().int().nonnegative().default(50),
+  PRO_COVER_LETTERS_PER_MONTH: z.coerce.number().int().nonnegative().default(50),
+  PRO_INTERVIEW_PREPS_PER_MONTH: z.coerce.number().int().nonnegative().default(50),
+  PRO_ANSWER_FEEDBACK_PER_MONTH: z.coerce.number().int().nonnegative().default(300),
 });
 
 const parsed = envSchema.safeParse(process.env);

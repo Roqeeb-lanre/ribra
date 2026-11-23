@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import { PlanCards } from '@/components/billing/PlanCards';
 import { Logo } from '@/components/ui/Logo';
 import { getHealth, type HealthResponse } from '@/lib/health';
 import { useAuthStore } from '@/stores/auth';
@@ -104,6 +105,37 @@ export default function LandingPage() {
               <p className="mt-2 text-sm leading-relaxed text-slate-400">{f.text}</p>
             </div>
           ))}
+        </section>
+
+        <section id="pricing" className="mx-auto mt-24 max-w-3xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-white">
+            Simple pricing
+          </h2>
+          <p className="mt-2 text-slate-400">
+            Start free. Upgrade when your job search gets serious.
+          </p>
+          <div className="mt-8">
+            <PlanCards
+              freeAction={
+                <Link
+                  to={authStatus === 'authenticated' ? '/dashboard' : '/register'}
+                  className="block rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-white/10"
+                >
+                  {authStatus === 'authenticated' ? 'Open your dashboard' : 'Start free'}
+                </Link>
+              }
+              proAction={
+                <Link
+                  to={authStatus === 'authenticated' ? '/billing' : '/register'}
+                  className="block rounded-lg bg-brand-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-600"
+                >
+                  {authStatus === 'authenticated'
+                    ? 'Upgrade to Pro'
+                    : 'Start free, upgrade anytime'}
+                </Link>
+              }
+            />
+          </div>
         </section>
 
         <StatusCard status={status} />

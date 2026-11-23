@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { scoreTone } from '@/features/cv/score';
 import type { JobMatch } from '@/features/jobs/types';
 import { cn } from '@/lib/cn';
+import { useAuthStore } from '@/stores/auth';
 
 /** Top of the cover letter and interview prep pages: which job this is for. */
 export function MatchHeader({
@@ -44,10 +45,20 @@ export function UsageNote({
   counter?: { limit: number | null; remaining: number | null };
   what: string;
 }) {
+  const plan = useAuthStore((st) => st.user?.plan);
   if (!counter || counter.limit === null) return null;
   return (
     <p className={cn('text-xs', counter.remaining === 0 ? 'text-warning' : 'text-slate-500')}>
-      {counter.remaining} of {counter.limit} free {what} left this month
+      {counter.remaining} of {counter.limit} {plan === 'pro' ? '' : 'free '}
+      {what} left this month
+      {counter.remaining === 0 && plan !== 'pro' && (
+        <>
+          {' · '}
+          <Link to="/billing" className="font-medium text-brand-300 hover:text-brand-200">
+            Upgrade to Pro
+          </Link>
+        </>
+      )}
     </p>
   );
 }

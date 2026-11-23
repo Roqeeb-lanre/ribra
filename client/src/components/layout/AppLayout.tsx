@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { VerifyEmailBanner } from '@/components/auth/VerifyEmailBanner';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
@@ -54,6 +54,22 @@ export function AppLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            {user.plan === 'pro' ? (
+              <Link
+                to="/billing"
+                title="Your plan"
+                className="rounded-md bg-brand-500 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-600"
+              >
+                Pro
+              </Link>
+            ) : (
+              <Link
+                to="/billing"
+                className="rounded-lg border border-brand-400/40 bg-brand-500/10 px-3 py-1.5 text-xs font-semibold text-brand-200 hover:bg-brand-500/20"
+              >
+                Upgrade
+              </Link>
+            )}
             <div className="hidden text-right md:block">
               <p className="text-sm font-medium text-white">{user.name}</p>
               <p className="text-xs text-slate-400">{user.email}</p>

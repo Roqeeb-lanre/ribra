@@ -11,7 +11,7 @@ import {
   interviewPrepSchema,
 } from '../../ai/prompts/interviewPrep.js';
 import * as usage from '../usage/usage.service.js';
-import { UserModel } from '../users/user.model.js';
+import { UserModel, currentPlan } from '../users/user.model.js';
 import { ResumeModel } from '../resumes/resume.model.js';
 import { JobMatchModel } from '../jobMatches/jobMatch.model.js';
 import { loadMatchContext, toObjectId } from '../jobMatches/matchContext.js';
@@ -28,7 +28,7 @@ const notFound = (what = 'Interview prep') => new AppError(404, `${what} not fou
 export async function prepareInterview(userId: string, jobMatchId: string) {
   const { match, resume, user } = await loadMatchContext(userId, jobMatchId);
 
-  await usage.reserveUse(userId, user.plan, 'interviewPrep');
+  await usage.reserveUse(userId, currentPlan(user), 'interviewPrep');
   let result;
   try {
     result = await generateStructured({
@@ -115,7 +115,7 @@ export async function reviewAnswer(
   ]);
   if (!user) throw new AppError(401, 'You need to log in.', 'UNAUTHORIZED');
 
-  await usage.reserveUse(userId, user.plan, 'answerFeedback');
+  await usage.reserveUse(userId, currentPlan(user), 'answerFeedback');
   let result;
   try {
     result = await generateStructured({

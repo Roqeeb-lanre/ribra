@@ -9,6 +9,7 @@ import {
   type CoverLetterResult,
 } from '../../ai/prompts/coverLetter.js';
 import * as usage from '../usage/usage.service.js';
+import { currentPlan } from '../users/user.model.js';
 import { loadMatchContext, toObjectId } from '../jobMatches/matchContext.js';
 import { CoverLetterModel, toPublicCoverLetter } from './coverLetter.model.js';
 import type { CreateCoverLetterInput, UpdateCoverLetterInput } from './coverLetters.schema.js';
@@ -24,7 +25,7 @@ export function composeLetter(ai: CoverLetterResult, name: string): string {
 export async function writeCoverLetter(userId: string, input: CreateCoverLetterInput) {
   const { match, resume, user } = await loadMatchContext(userId, input.jobMatchId);
 
-  await usage.reserveUse(userId, user.plan, 'coverLetter');
+  await usage.reserveUse(userId, currentPlan(user), 'coverLetter');
   let result;
   try {
     result = await generateStructured({

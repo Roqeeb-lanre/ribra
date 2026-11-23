@@ -34,6 +34,9 @@ export default function PrepPage() {
           <Pill label="Cover letters" counter={usage.data.coverLetter} />
           <Pill label="Interview prep sets" counter={usage.data.interviewPrep} />
           <Pill label="Answer reviews" counter={usage.data.answerFeedback} />
+          <Link to="/billing" className="px-1 py-1 font-medium text-brand-300 hover:text-brand-200">
+            Need more? Upgrade to Pro →
+          </Link>
         </div>
       )}
 

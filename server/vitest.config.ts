@@ -13,6 +13,9 @@ export default defineConfig({
       FREE_COVER_LETTERS_PER_MONTH: '5',
       FREE_INTERVIEW_PREPS_PER_MONTH: '5',
       FREE_ANSWER_FEEDBACK_PER_MONTH: '30',
+      PAYSTACK_SECRET_KEY: 'sk_test_ribra_tests',
+      PAYSTACK_PLAN_CODE: 'PLN_test',
+      PRO_PRICE_NGN: '5000',
     },
     // The first run downloads a MongoDB binary for the in-memory test database.
     hookTimeout: 120_000,

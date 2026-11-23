@@ -10,7 +10,8 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "ai:check": "tsx --env-file-if-exists=.env scripts/ai-check.ts"
+    "ai:check": "tsx --env-file-if-exists=.env scripts/ai-check.ts",
+    "paystack:plan": "tsx --env-file-if-exists=.env scripts/paystack-plan.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

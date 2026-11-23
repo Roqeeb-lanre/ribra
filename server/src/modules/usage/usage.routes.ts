@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middleware/auth.js';
 import { AppError } from '../../utils/AppError.js';
-import { UserModel } from '../users/user.model.js';
+import { UserModel, currentPlan } from '../users/user.model.js';
 import { getUsageSummary } from './usage.service.js';
 
 export const usageRouter = Router();
@@ -10,5 +10,5 @@ export const usageRouter = Router();
 usageRouter.get('/', requireAuth, async (req, res) => {
   const user = await UserModel.findById(req.auth!.userId);
   if (!user) throw new AppError(401, 'You need to log in.', 'UNAUTHORIZED');
-  res.json({ usage: await getUsageSummary(user.id, user.plan) });
+  res.json({ usage: await getUsageSummary(user.id, currentPlan(user)) });
 });

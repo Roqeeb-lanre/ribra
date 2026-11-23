@@ -12,6 +12,17 @@ const userSchema = new Schema(
     // Set when the user signs in with Google. Sparse: only users who did have one.
     googleId: { type: String, unique: true, sparse: true },
     plan: { type: String, enum: ['free', 'pro'], default: 'free', required: true },
+    // Pro lasts until this moment (end of the paid month plus a few days' grace for renewals).
+    proUntil: { type: Date, default: null },
+    billing: {
+      customerCode: { type: String },
+      subscriptionCode: { type: String },
+      // Paystack needs this together with the subscription code to cancel it.
+      emailToken: { type: String, select: false },
+      // active | non-renewing | attention | cancelled | completed (Paystack's subscription status)
+      status: { type: String },
+      nextPaymentAt: { type: Date },
+    },
     lastLoginAt: { type: Date },
   },
   { timestamps: true },
@@ -23,6 +34,15 @@ export type UserRole = User['role'];
 
 export const UserModel = model('User', userSchema);
 
+export type Plan = 'free' | 'pro';
+
+/** The plan the user really has right now: Pro only counts until it runs out. */
+export function currentPlan(user: { plan?: string | null; proUntil?: Date | null }): Plan {
+  return user.plan === 'pro' && user.proUntil && user.proUntil.getTime() > Date.now()
+    ? 'pro'
+    : 'free';
+}
+
 /** The only shape of a user that ever leaves the API. */
 export function toPublicUser(user: UserDocument) {
   return {
@@ -32,7 +52,8 @@ export function toPublicUser(user: UserDocument) {
     role: user.role,
     emailVerified: user.emailVerified,
     avatarUrl: user.avatarUrl ?? null,
-    plan: user.plan,
+    plan: currentPlan(user),
+    proUntil: currentPlan(user) === 'pro' ? user.proUntil : null,
     hasPassword: Boolean(user.passwordHash),
     googleLinked: Boolean(user.googleId),
     createdAt: user.createdAt,

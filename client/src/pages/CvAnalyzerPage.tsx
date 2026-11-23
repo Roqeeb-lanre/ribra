@@ -92,7 +92,16 @@ export default function CvAnalyzerPage() {
               outOfAnalyses ? 'border-danger/40 text-rose-200' : 'border-white/10 text-slate-300',
             )}
           >
-            {remaining} of {usage.data.cvAnalysis.limit} free analyses left this month
+            {remaining} of {usage.data.cvAnalysis.limit} {usage.data.plan === 'pro' ? '' : 'free '}
+            analyses left this month
+            {remaining === 0 && usage.data.plan !== 'pro' && (
+              <>
+                {' · '}
+                <Link to="/billing" className="text-brand-300 hover:text-brand-200">
+                  Upgrade
+                </Link>
+              </>
+            )}
           </span>
         )}
       </div>

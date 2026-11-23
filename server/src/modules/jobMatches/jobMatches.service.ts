@@ -8,7 +8,7 @@ import {
   buildJobMatchMessages,
   jobMatchSchema,
 } from '../../ai/prompts/jobMatch.js';
-import { UserModel } from '../users/user.model.js';
+import { UserModel, currentPlan } from '../users/user.model.js';
 import { ResumeModel } from '../resumes/resume.model.js';
 import * as usage from '../usage/usage.service.js';
 import { JobMatchModel, toJobMatchSummary, toPublicJobMatch } from './jobMatch.model.js';
@@ -57,7 +57,7 @@ export async function createJobMatch(userId: string, input: CreateJobMatchInput)
   const user = await UserModel.findById(userId);
   if (!user) throw new AppError(401, 'You need to log in.', 'UNAUTHORIZED');
 
-  await usage.reserveUse(userId, user.plan, 'jobMatch');
+  await usage.reserveUse(userId, currentPlan(user), 'jobMatch');
 
   let result;
   try {

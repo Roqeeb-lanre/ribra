@@ -13,6 +13,7 @@ import { jobMatchesRouter } from './modules/jobMatches/jobMatches.routes.js';
 import { applicationsRouter } from './modules/applications/applications.routes.js';
 import { coverLettersRouter } from './modules/coverLetters/coverLetters.routes.js';
 import { interviewPrepsRouter } from './modules/interviewPreps/interviewPreps.routes.js';
+import { billingRouter } from './modules/billing/billing.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 /**
@@ -28,6 +29,8 @@ export function createApp() {
   // Security and parsing
   app.use(helmet());
   app.use(cors({ origin: env.clientOrigins, credentials: true }));
+  // Paystack webhooks need the exact raw bytes to check their signature, so they skip the JSON parser.
+  app.use('/api/v1/billing/paystack/webhook', express.raw({ type: '*/*', limit: '1mb' }));
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
   app.use(
@@ -49,6 +52,7 @@ export function createApp() {
   app.use('/api/v1/applications', applicationsRouter);
   app.use('/api/v1/cover-letters', coverLettersRouter);
   app.use('/api/v1/interview-preps', interviewPrepsRouter);
+  app.use('/api/v1/billing', billingRouter);
   app.use('/api/v1/usage', usageRouter);
 
   // Errors

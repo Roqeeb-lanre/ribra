@@ -7,7 +7,7 @@ import {
   buildCvAnalysisMessages,
   cvAnalysisSchema,
 } from '../../ai/prompts/cvAnalysis.js';
-import { UserModel } from '../users/user.model.js';
+import { UserModel, currentPlan } from '../users/user.model.js';
 import * as usage from '../usage/usage.service.js';
 import { ResumeModel, toPublicResume } from './resume.model.js';
 import { AnalysisModel, toAnalysisSummary, toPublicAnalysis } from './analysis.model.js';
@@ -102,7 +102,7 @@ export async function analyzeResume(userId: string, resumeId: string, targetRole
   if (!user) throw new AppError(401, 'You need to log in.', 'UNAUTHORIZED');
 
   // Count this use up front (atomic), and give it back if the AI fails.
-  await usage.reserveUse(userId, user.plan, 'cvAnalysis');
+  await usage.reserveUse(userId, currentPlan(user), 'cvAnalysis');
 
   let result;
   try {

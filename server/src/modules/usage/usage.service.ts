@@ -28,7 +28,16 @@ export function currentPeriod(date = new Date()): string {
 
 /** Monthly limit per plan. null = unlimited. */
 export function limitFor(feature: Feature, plan: Plan): number | null {
-  if (plan === 'pro') return null;
+  if (plan === 'pro') {
+    const proLimits: Record<Feature, number> = {
+      cvAnalysis: env.PRO_CV_ANALYSES_PER_MONTH,
+      jobMatch: env.PRO_JOB_MATCHES_PER_MONTH,
+      coverLetter: env.PRO_COVER_LETTERS_PER_MONTH,
+      interviewPrep: env.PRO_INTERVIEW_PREPS_PER_MONTH,
+      answerFeedback: env.PRO_ANSWER_FEEDBACK_PER_MONTH,
+    };
+    return proLimits[feature];
+  }
   const limits: Record<Feature, number> = {
     cvAnalysis: env.FREE_CV_ANALYSES_PER_MONTH,
     jobMatch: env.FREE_JOB_MATCHES_PER_MONTH,
@@ -75,7 +84,9 @@ export async function reserveUse(userId: string, plan: Plan, feature: Feature): 
     if ((err as { code?: number }).code === 11000) {
       throw new AppError(
         403,
-        `You've used all ${limit} free ${featureNames[feature]} for this month. They reset on the 1st.`,
+        plan === 'pro'
+          ? `You've used all ${limit} ${featureNames[feature]} in Pro for this month. They reset on the 1st.`
+          : `You've used all ${limit} free ${featureNames[feature]} for this month. They reset on the 1st, or upgrade to Pro for more.`,
         'PLAN_LIMIT_REACHED',
       );
     }
